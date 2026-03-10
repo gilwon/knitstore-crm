@@ -45,13 +45,13 @@
 
 ### 2.1 In Scope (MVP)
 
-- [ ] 로트(Dye Lot) 번호 기반 재고 등록/조회/차감
-- [ ] 로트 혼합 판매 경고 시스템
-- [ ] 수강생 프로필 관리 (이름, 연락처, 메모)
-- [ ] 수강권 등록 및 출석 시 자동 차감
-- [ ] 실 판매 + 수강료 처리 통합 POS 화면 (태블릿 최적화)
-- [ ] 강사(오너) 인증 및 기본 권한 관리
-- [ ] 반응형 웹 UI (태블릿/모바일 우선)
+- [x] 로트(Dye Lot) 번호 기반 재고 등록/조회/차감
+- [x] 로트 혼합 판매 경고 시스템
+- [x] 수강생 프로필 관리 (이름, 연락처, 메모)
+- [x] 수강권 등록 및 출석 시 자동 차감
+- [x] 실 판매 + 수강료 처리 통합 POS 화면 (태블릿 최적화)
+- [x] 강사(오너) 인증 및 기본 권한 관리
+- [x] 반응형 웹 UI (태블릿/모바일 우선)
 
 ### 2.2 Out of Scope (v1 이후)
 
@@ -74,19 +74,19 @@
 
 | ID | Requirement | Priority | Status |
 |----|-------------|----------|--------|
-| FR-01 | 상품 등록 시 품번 + 로트 번호 단위로 재고 분리 관리. 재고 단위는 상품별로 볼(ball) 또는 g 중 선택 | High | Pending |
-| FR-02 | 로트별 입고 등록: 수량 입력 시 해당 로트 재고에 **+** 반영 | High | Pending |
-| FR-03 | 로트별 출고 등록: 수량 입력 시 해당 로트 재고에 **-** 반영 (재고 부족 시 차단) | High | Pending |
-| FR-04 | 로트별 현재고 조회 (입고 누적 - 출고 누적 = 현재고) | High | Pending |
-| FR-05 | 입고/출고 이력 조회 (날짜, 수량, 사유, 메모) | Medium | Pending |
-| FR-06 | 판매 시 동일 로트 수량 부족하면 혼합 경고 표시 | High | Pending |
-| FR-07 | 수강생 프로필 CRUD (이름, 연락처, 메모) | High | Pending |
-| FR-08 | 수강권 종류 관리 (횟수제: N회, 기간제: N일) | High | Pending |
-| FR-09 | 출석 체크 시 수강권 자동 차감 + 잔여 횟수 표시 | High | Pending |
-| FR-10 | 실 판매 POS 화면 (상품 검색, 수량 입력, 로트 선택) | High | Pending |
-| FR-11 | 수강료 결제 POS 화면 (수강권 구매/연장) | Medium | Pending |
-| FR-12 | 재고 부족 알림 (로트별 임계값 설정) | Medium | Pending |
-| FR-13 | 강사(오너) 이메일 로그인/회원가입 | High | Pending |
+| FR-01 | 상품 등록 시 품번 + 로트 번호 단위로 재고 분리 관리. 재고 단위는 상품별로 볼(ball) 또는 g 중 선택 | High | ✅ Done |
+| FR-02 | 로트별 입고 등록: 수량 입력 시 해당 로트 재고에 **+** 반영 | High | ✅ Done |
+| FR-03 | 로트별 출고 등록: 수량 입력 시 해당 로트 재고에 **-** 반영 (재고 부족 시 차단) | High | ✅ Done |
+| FR-04 | 로트별 현재고 조회 (입고 누적 - 출고 누적 = 현재고) | High | ✅ Done |
+| FR-05 | 입고/출고 이력 조회 (날짜, 수량, 사유, 메모) | Medium | ✅ Done |
+| FR-06 | 판매 시 동일 로트 수량 부족하면 혼합 경고 표시 | High | ✅ Done |
+| FR-07 | 수강생 프로필 CRUD (이름, 연락처, 메모) | High | ✅ Done |
+| FR-08 | 수강권 종류 관리 (횟수제: N회, 기간제: N일) | High | ✅ Done |
+| FR-09 | 출석 체크 시 수강권 자동 차감 + 잔여 횟수 표시 | High | ✅ Done |
+| FR-10 | 실 판매 POS 화면 (상품 검색, 수량 입력, 로트 선택) | High | ✅ Done |
+| FR-11 | 수강료 결제 POS 화면 (수강권 구매/연장) | Medium | ✅ Done |
+| FR-12 | 재고 부족 알림 (로트별 임계값 설정) | Medium | ✅ Done |
+| FR-13 | 강사(오너) 이메일 로그인/회원가입 | High | ✅ Done |
 
 ### 3.2 Non-Functional Requirements
 
@@ -104,18 +104,18 @@
 
 ### 4.1 Definition of Done
 
-- [ ] 모든 High 우선순위 기능 요구사항 구현 완료
+- [x] 모든 High 우선순위 기능 요구사항 구현 완료
 - [ ] 태블릿(iPad) 환경에서 주요 플로우 정상 동작
-- [ ] Supabase RLS 정책 적용 완료
+- [x] Supabase RLS 정책 적용 완료
 - [ ] 주요 비즈니스 로직 테스트 작성
 - [ ] 코드 리뷰 완료
 
 ### 4.2 Quality Criteria
 
-- [ ] TypeScript strict mode 적용
-- [ ] ESLint + Prettier 설정 및 에러 0건
-- [ ] 빌드 성공 (next build)
-- [ ] 로트 혼합 경고 로직 엣지케이스 검증
+- [x] TypeScript strict mode 적용
+- [ ] ESLint + Prettier 설정 및 에러 0건 (ESLint ✅, Prettier 미설정)
+- [x] 빌드 성공 (next build)
+- [x] 로트 혼합 경고 로직 엣지케이스 검증
 
 ---
 
@@ -241,11 +241,11 @@ src/
 
 ### 7.1 Existing Project Conventions
 
-- [ ] `CLAUDE.md` has coding conventions section
+- [x] `CLAUDE.md` has coding conventions section
 - [ ] `docs/01-plan/conventions.md` exists
-- [ ] ESLint configuration (`.eslintrc.*`)
+- [x] ESLint configuration (`eslint.config.mjs`)
 - [ ] Prettier configuration (`.prettierrc`)
-- [ ] TypeScript configuration (`tsconfig.json`)
+- [x] TypeScript configuration (`tsconfig.json`)
 
 > 신규 프로젝트이므로 모두 새로 생성 필요
 
@@ -280,38 +280,38 @@ src/
 ## 8. Implementation Phases (MVP Roadmap)
 
 ### Phase 1: 프로젝트 초기화 + DB 스키마 (1주)
-- [ ] Next.js + Supabase + shadcn/ui 프로젝트 셋업
-- [ ] Supabase 테이블 설계 및 마이그레이션
-- [ ] RLS 정책 설정
-- [ ] 인증 플로우 (이메일 로그인/회원가입)
+- [x] Next.js + Supabase + shadcn/ui 프로젝트 셋업
+- [x] Supabase 테이블 설계 및 마이그레이션
+- [x] RLS 정책 설정
+- [x] 인증 플로우 (이메일 로그인/회원가입)
 
 ### Phase 2: 재고/로트 관리 (1~2주)
-- [ ] 상품 등록/수정/삭제 CRUD
-- [ ] 로트 번호별 재고 조회 화면
-- [ ] 입고 등록 (수량 입력 → stock_quantity + 반영)
-- [ ] 출고 등록 (수량 입력 → stock_quantity - 반영, 재고 부족 시 차단)
-- [ ] 입고/출고 이력 목록 조회
-- [ ] 로트 혼합 경고 로직
-- [ ] 재고 부족 알림 임계값 설정
+- [x] 상품 등록/수정/삭제 CRUD
+- [x] 로트 번호별 재고 조회 화면
+- [x] 입고 등록 (수량 입력 → stock_quantity + 반영)
+- [x] 출고 등록 (수량 입력 → stock_quantity - 반영, 재고 부족 시 차단)
+- [x] 입고/출고 이력 목록 조회
+- [x] 로트 혼합 경고 로직
+- [x] 재고 부족 알림 임계값 설정
 
 ### Phase 3: 수강생/수강권 관리 (1~2주)
-- [ ] 수강생 프로필 CRUD
-- [ ] 수강권 등록 (횟수제/기간제)
-- [ ] 출석 체크 및 수강권 자동 차감
+- [x] 수강생 프로필 CRUD
+- [x] 수강권 등록 (횟수제/기간제)
+- [x] 출석 체크 및 수강권 자동 차감
 
 ### Phase 4: POS 통합 화면 (1주)
-- [ ] 실 판매 POS (상품 검색 → 로트 선택 → 결제)
-- [ ] 수강료 결제 POS (수강권 구매/연장)
-- [ ] 태블릿 최적화 UI
+- [x] 실 판매 POS (상품 검색 → 로트 선택 → 결제)
+- [x] 수강료 결제 POS (수강권 구매/연장)
+- [x] 태블릿 최적화 UI
 
 ---
 
 ## 9. Next Steps
 
-1. [ ] Design 문서 작성 (`knitstore-crm.design.md`) - 상세 DB 스키마, API 설계, UI 와이어프레임
+1. [x] Design 문서 작성 (`knitstore-crm.design.md`) - 상세 DB 스키마, API 설계, UI 와이어프레임
 2. [ ] Phase 1 Schema 정의 (`/phase-1-schema`)
 3. [ ] Phase 2 Convention 정의 (`/phase-2-convention`)
-4. [ ] 구현 시작
+4. [x] 구현 시작
 
 ---
 

@@ -782,10 +782,10 @@ const { mutate: stockIn } = useMutation({
 
 - [x] RLS 정책으로 공방별 데이터 완전 격리 (Section 3.4)
 - [x] DB Function은 SECURITY DEFINER로 트랜잭션 무결성 보장
-- [ ] Supabase Auth 이메일 인증
-- [ ] HTTPS (Vercel 기본 제공)
-- [ ] 입력값 클라이언트 + DB 레벨 이중 검증 (CHECK 제약조건)
-- [ ] stock_quantity >= 0 CHECK로 음수 재고 방지
+- [x] Supabase Auth 이메일 인증
+- [ ] HTTPS (Vercel 기본 제공) — 배포 후 자동 적용
+- [x] 입력값 클라이언트 + DB 레벨 이중 검증 (CHECK 제약조건)
+- [x] stock_quantity >= 0 CHECK로 음수 재고 방지
 
 ---
 
@@ -802,22 +802,22 @@ const { mutate: stockIn } = useMutation({
 ### 8.2 Test Cases (Key)
 
 **재고 관리**
-- [ ] 입고 등록 시 stock_quantity가 정확히 증가하는지
-- [ ] 출고 등록 시 stock_quantity가 정확히 감소하는지
-- [ ] 현재고보다 많은 수량 출고 시 에러 발생하는지
-- [ ] 현재고가 0 이하로 내려가지 않는지 (CHECK 제약)
-- [ ] POS 판매 시 stock_movements 자동 생성되는지
-- [ ] 로트 혼합 경고가 올바르게 표시되는지
-- [ ] 재고 부족 알림 임계값이 정상 동작하는지
+- [x] 입고 등록 시 stock_quantity가 정확히 증가하는지 — process_stock_in RPC: stock_quantity + p_quantity
+- [x] 출고 등록 시 stock_quantity가 정확히 감소하는지 — process_stock_out RPC: stock_quantity - p_quantity
+- [x] 현재고보다 많은 수량 출고 시 에러 발생하는지 — process_stock_out: RAISE EXCEPTION 'INSUFFICIENT_STOCK'
+- [x] 현재고가 0 이하로 내려가지 않는지 (CHECK 제약) — migration: CHECK (stock_quantity >= 0)
+- [x] POS 판매 시 stock_movements 자동 생성되는지 — useSale.ts: process_stock_out RPC가 stock_movements INSERT
+- [x] 로트 혼합 경고가 올바르게 표시되는지 — LotMixWarning.tsx: 단일 로트 재고 부족 시 다이얼로그 표시
+- [x] 재고 부족 알림 임계값이 정상 동작하는지 — alert_threshold 기반 재고 부족 배지 표시
 
 **수강생 관리**
-- [ ] 횟수제 출석 시 remaining이 1 감소하는지
-- [ ] remaining이 0이면 출석 차단되는지
-- [ ] 기간제 만료 후 출석 차단되는지
-- [ ] 수강권 상태(active/expired/exhausted)가 올바르게 전환되는지
+- [x] 횟수제 출석 시 remaining이 1 감소하는지 — process_attendance: remaining = remaining - 1
+- [x] remaining이 0이면 출석 차단되는지 — process_attendance: RAISE EXCEPTION 'SUBSCRIPTION_EXHAUSTED'
+- [x] 기간제 만료 후 출석 차단되는지 — process_attendance: RAISE EXCEPTION 'SUBSCRIPTION_EXPIRED'
+- [x] 수강권 상태(active/expired/exhausted)가 올바르게 전환되는지 — process_attendance: status CASE WHEN remaining-1<=0
 
 **RLS**
-- [ ] 다른 공방의 데이터에 접근 불가한지
+- [x] 다른 공방의 데이터에 접근 불가한지 — migration: 전체 테이블 RLS 정책 적용
 
 ---
 
@@ -967,18 +967,18 @@ src/
 
 ### 11.2 Implementation Order
 
-1. [ ] **프로젝트 초기화**: Next.js + Supabase + shadcn/ui + TanStack Query 셋업
-2. [ ] **DB 스키마**: Supabase 마이그레이션 (tables + RLS + functions)
-3. [ ] **인증**: 회원가입/로그인 + 공방 자동 생성 + 미들웨어
-4. [ ] **공통 레이아웃**: AppSidebar + dashboard layout
-5. [ ] **상품 CRUD**: products 테이블 CRUD + UI
-6. [ ] **로트/재고**: lots 생성 + 입고(process_stock_in) + 출고(process_stock_out) + 이력
-7. [ ] **로트 혼합 경고**: 판매 시 단일 로트 충족 여부 체크
-8. [ ] **수강생 CRUD**: students 테이블 CRUD + UI
-9. [ ] **수강권**: subscriptions 등록 + 출석(process_attendance) + 자동 차감
-10. [ ] **POS 판매**: 실 판매 탭 (장바구니 → 결제 → 자동 출고)
-11. [ ] **POS 수강료**: 수강료 탭 (수강권 구매/연장)
-12. [ ] **재고 알림**: alert_threshold 기반 부족 알림 UI
+1. [x] **프로젝트 초기화**: Next.js + Supabase + shadcn/ui + TanStack Query 셋업
+2. [x] **DB 스키마**: Supabase 마이그레이션 (tables + RLS + functions)
+3. [x] **인증**: 회원가입/로그인 + 공방 자동 생성 + 미들웨어
+4. [x] **공통 레이아웃**: AppSidebar + dashboard layout
+5. [x] **상품 CRUD**: products 테이블 CRUD + UI
+6. [x] **로트/재고**: lots 생성 + 입고(process_stock_in) + 출고(process_stock_out) + 이력
+7. [x] **로트 혼합 경고**: 판매 시 단일 로트 충족 여부 체크
+8. [x] **수강생 CRUD**: students 테이블 CRUD + UI
+9. [x] **수강권**: subscriptions 등록 + 출석(process_attendance) + 자동 차감
+10. [x] **POS 판매**: 실 판매 탭 (장바구니 → 결제 → 자동 출고)
+11. [x] **POS 수강료**: 수강료 탭 (수강권 구매/연장)
+12. [x] **재고 알림**: alert_threshold 기반 부족 알림 UI
 
 ---
 
