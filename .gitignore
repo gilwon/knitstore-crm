@@ -45,3 +45,4 @@ next-env.d.ts
 # md
 CLAUDE.md
 .claude/
+.claude/agent-memory/bkit-gap-detector/
