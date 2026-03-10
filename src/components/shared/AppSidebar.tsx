@@ -27,7 +27,7 @@ export function AppSidebar({ shopName }: AppSidebarProps) {
   return (
     <aside className="flex flex-col w-56 h-full bg-sidebar border-r border-sidebar-border shrink-0">
       {/* 공방 헤더 */}
-      <Link href="/dashboard" className="block px-4 py-5 border-b border-sidebar-border hover:bg-sidebar-accent transition-colors">
+      <Link href="/dashboard" className="flex items-center h-[68px] px-4 border-b border-sidebar-border hover:bg-sidebar-accent transition-colors shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-md bg-sidebar-primary flex items-center justify-center shrink-0">
             <span className="text-xs text-sidebar-primary-foreground font-bold">K</span>
