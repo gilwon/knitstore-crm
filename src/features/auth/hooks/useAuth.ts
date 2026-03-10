@@ -45,7 +45,7 @@ export function useSignIn() {
       toast.error('이메일 또는 비밀번호가 올바르지 않습니다')
       setLoading(false)
     } else {
-      router.push('/inventory')
+      router.push('/dashboard')
       router.refresh()
       // 리다이렉트 완료까지 로딩 상태 유지 (setLoading 호출하지 않음)
     }
