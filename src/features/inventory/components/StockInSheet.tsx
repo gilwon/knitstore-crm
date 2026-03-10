@@ -98,7 +98,18 @@ export function StockInSheet({
                   }}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="로트 선택" />
+                    <SelectValue>
+                      {selectedLotId === NEW_LOT
+                        ? '+ 새 로트 번호 입력'
+                        : selectedLotId
+                          ? (() => {
+                              const lot = lots.find((l) => l.id === selectedLotId)
+                              return lot
+                                ? `${lot.lot_number} (현재고: ${lot.stock_quantity}${product.unit === 'ball' ? '볼' : 'g'})`
+                                : '로트 선택'
+                            })()
+                          : '로트 선택'}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {lots.map((lot) => (

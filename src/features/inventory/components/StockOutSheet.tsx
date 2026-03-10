@@ -84,7 +84,16 @@ export function StockOutSheet({
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="로트 선택" />
+                    <SelectValue>
+                      {field.value
+                        ? (() => {
+                            const lot = availableLots.find((l) => l.id === field.value)
+                            return lot
+                              ? `${lot.lot_number} (현재고: ${lot.stock_quantity}${product.unit === 'ball' ? '볼' : 'g'})`
+                              : '로트 선택'
+                          })()
+                        : '로트 선택'}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {availableLots.length === 0 ? (
