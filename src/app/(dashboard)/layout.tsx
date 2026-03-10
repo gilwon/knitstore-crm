@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { AppSidebar } from '@/components/shared/AppSidebar'
+import { DashboardShell } from '@/components/shared/DashboardShell'
 import type { Shop } from '@/types/database'
 
 export default async function DashboardLayout({
@@ -23,9 +23,8 @@ export default async function DashboardLayout({
   const shopName = shop?.name ?? '내 공방'
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <AppSidebar shopName={shopName} />
-      <main className="flex-1 overflow-y-auto">{children}</main>
-    </div>
+    <DashboardShell shopName={shopName}>
+      {children}
+    </DashboardShell>
   )
 }

@@ -17,15 +17,24 @@ const navItems = [
 
 interface AppSidebarProps {
   shopName: string
+  isOpen?: boolean
+  onClose?: () => void
 }
 
-export function AppSidebar({ shopName }: AppSidebarProps) {
+export function AppSidebar({ shopName, isOpen = false, onClose }: AppSidebarProps) {
   const pathname = usePathname()
   const { signOut } = useSignOut()
   const { theme, setTheme } = useTheme()
 
   return (
-    <aside className="flex flex-col w-56 h-full bg-sidebar border-r border-sidebar-border shrink-0">
+    <aside className={cn(
+      "flex flex-col bg-sidebar border-r border-sidebar-border",
+      // Mobile: fixed overlay
+      "fixed inset-y-0 left-0 z-30 w-72 h-full transition-transform duration-300",
+      // Desktop: static sidebar
+      "md:relative md:w-56 md:translate-x-0 md:shrink-0 md:transition-none",
+      isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+    )}>
       {/* 공방 헤더 */}
       <Link href="/dashboard" className="flex items-center h-[68px] px-4 border-b border-sidebar-border hover:bg-sidebar-accent transition-colors shrink-0">
         <div className="flex items-center gap-2.5">
@@ -47,6 +56,7 @@ export function AppSidebar({ shopName }: AppSidebarProps) {
             <Link
               key={href}
               href={href}
+              onClick={onClose}
               className={cn(
                 'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                 isActive
