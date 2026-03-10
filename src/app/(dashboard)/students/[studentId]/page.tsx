@@ -222,7 +222,7 @@ export default function StudentDetailPage({ params }: PageProps) {
             <TabsContent value="attendance" className="mt-4">
               <Card>
                 <CardContent className="p-0 px-4">
-                  <AttendanceHistory attendances={attendances} />
+                  <AttendanceHistory attendances={attendances} studentId={student.id} />
                 </CardContent>
               </Card>
             </TabsContent>

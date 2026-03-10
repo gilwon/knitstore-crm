@@ -383,8 +383,13 @@ export interface Database {
           p_student_id: string
           p_subscription_id: string
           p_memo?: string | null
+          p_attended_at?: string | null
         }
         Returns: string
+      }
+      delete_attendance: {
+        Args: { p_attendance_id: string }
+        Returns: void
       }
     }
     Enums: { [_ in never]: never }
