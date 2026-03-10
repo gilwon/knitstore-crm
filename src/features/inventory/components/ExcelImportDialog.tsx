@@ -23,6 +23,7 @@ interface ParsedRow {
   color_code: string
   color_name: string
   unit: string
+  purchase_price: number
   price: number
   alert_threshold: number
   lot_number: string
@@ -39,15 +40,15 @@ interface ImportResult {
 
 // ─── 엑셀 템플릿 다운로드 ────────────────────────────────────────────
 function downloadTemplate() {
-  const headers = ['상품명*', '브랜드', '색상번호', '색상명', '단위*(ball/g)', '판매단가', '부족알림수량', '로트번호', '초기수량']
-  const example = ['코튼골드', '알리제', '#101', '레드', 'ball', '5000', '3', 'LOT-2026-A', '10']
+  const headers = ['상품명*', '브랜드', '색상번호*', '색상명*', '단위*(ball/g)', '구매단가*', '판매단가*', '부족알림수량', '로트번호', '초기수량']
+  const example = ['코튼골드', '알리제', '#101', '레드', 'ball', '3500', '5000', '3', 'LOT-2026-A', '10']
 
   const ws = XLSX.utils.aoa_to_sheet([headers, example])
 
   // 열 너비 설정
   ws['!cols'] = [
     { wch: 16 }, { wch: 12 }, { wch: 10 }, { wch: 10 },
-    { wch: 14 }, { wch: 10 }, { wch: 12 }, { wch: 14 }, { wch: 8 },
+    { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 14 }, { wch: 8 },
   ]
 
   const wb = XLSX.utils.book_new()
@@ -77,27 +78,34 @@ function parseExcelFile(file: File): Promise<ParsedRow[]> {
           const name = String(row[0] ?? '').trim()
           if (!name) continue  // 빈 행 스킵
 
+          const brand = String(row[1] ?? '').trim()
+          const color_code = String(row[2] ?? '').trim()
+          const color_name = String(row[3] ?? '').trim()
           const unit = String(row[4] ?? '').trim().toLowerCase()
-          const price = Number(row[5]) || 0
-          const alert_threshold = Number(row[6]) || 0
-          const quantity = Number(row[8]) || 0
+          const purchase_price = Number(row[5]) || 0
+          const price = Number(row[6]) || 0
+          const alert_threshold = Number(row[7]) || 0
+          const lot_number = String(row[8] ?? '').trim()
+          const quantity = Number(row[9]) || 0
           const errors: string[] = []
 
           if (!name) errors.push('상품명 필수')
+          if (!color_code) errors.push('색상번호 필수')
+          if (!color_name) errors.push('색상명 필수')
           if (unit !== 'ball' && unit !== 'g') errors.push('단위는 ball 또는 g')
-          if (price < 0) errors.push('단가 음수 불가')
+          if (purchase_price < 0) errors.push('구매단가 음수 불가')
+          if (price < 0) errors.push('판매단가 음수 불가')
           if (quantity < 0) errors.push('수량 음수 불가')
-
-          const lot_number = String(row[7] ?? '').trim()
           if (quantity > 0 && !lot_number) errors.push('수량 입력 시 로트번호 필수')
 
           parsed.push({
             rowIndex: i + 1,
             name,
-            brand: String(row[1] ?? '').trim(),
-            color_code: String(row[2] ?? '').trim(),
-            color_name: String(row[3] ?? '').trim(),
+            brand,
+            color_code,
+            color_name,
             unit,
+            purchase_price,
             price,
             alert_threshold,
             lot_number,
@@ -188,6 +196,7 @@ export function ExcelImportDialog({ open, onOpenChange, shopId }: ExcelImportDia
             color_code: row.color_code,
             color_name: row.color_name,
             unit: row.unit as 'ball' | 'g',
+            purchase_price: row.purchase_price,
             price: row.price,
             alert_threshold: row.alert_threshold,
           })
@@ -286,9 +295,9 @@ export function ExcelImportDialog({ open, onOpenChange, shopId }: ExcelImportDia
             {/* 양식 설명 */}
             <div className="rounded-md border p-3 text-xs text-muted-foreground space-y-1">
               <p className="font-medium text-foreground">열 순서 (1행: 헤더, 2행부터 데이터)</p>
-              <p>A: 상품명* · B: 브랜드 · C: 색상번호 · D: 색상명 · E: 단위*(ball/g)</p>
-              <p>F: 판매단가 · G: 부족알림수량 · H: 로트번호 · I: 초기수량</p>
-              <p className="text-xs">* H, I 열은 비워두면 상품만 등록됩니다.</p>
+              <p>A: 상품명* · B: 브랜드 · C: 색상번호* · D: 색상명* · E: 단위*(ball/g)</p>
+              <p>F: 구매단가* · G: 판매단가* · H: 부족알림수량 · I: 로트번호 · J: 초기수량</p>
+              <p className="text-xs">* I, J 열은 비워두면 상품만 등록됩니다.</p>
             </div>
           </div>
         )}

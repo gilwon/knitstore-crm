@@ -43,6 +43,7 @@ export interface Database {
           color_name: string
           unit: 'ball' | 'g'
           price: number
+          purchase_price: number
           alert_threshold: number
           created_at: string
           updated_at: string
@@ -56,6 +57,7 @@ export interface Database {
           color_name?: string
           unit: 'ball' | 'g'
           price?: number
+          purchase_price?: number
           alert_threshold?: number
           created_at?: string
           updated_at?: string
@@ -69,6 +71,7 @@ export interface Database {
           color_name?: string
           unit?: 'ball' | 'g'
           price?: number
+          purchase_price?: number
           alert_threshold?: number
           created_at?: string
           updated_at?: string

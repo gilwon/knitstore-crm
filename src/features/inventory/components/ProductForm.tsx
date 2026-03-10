@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter,
 } from '@/components/ui/sheet'
@@ -22,10 +23,11 @@ import type { Product } from '@/types/database'
 const schema = z.object({
   brand: z.string().max(50),
   name: z.string().min(1, '상품명을 입력해주세요').max(100),
-  color_code: z.string().max(20),
-  color_name: z.string().max(50),
+  color_code: z.string().min(1, '색상 번호를 입력해주세요').max(20),
+  color_name: z.string().min(1, '색상명을 입력해주세요').max(50),
   unit: z.enum(['ball', 'g']),
-  price: z.number().int().min(0),
+  purchase_price: z.number().int().min(0, '0 이상이어야 합니다'),
+  price: z.number().int().min(0, '0 이상이어야 합니다'),
   alert_threshold: z.number().int().min(0),
 })
 
@@ -41,9 +43,9 @@ interface ProductFormProps {
 export function ProductForm({ open, onOpenChange, shopId, editProduct }: ProductFormProps) {
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
+  const qc = useQueryClient()
   const isEdit = !!editProduct
 
-  // 초기 입고 필드 (zod 스키마 외 별도 관리 — optional number 처리)
   const [initLotNumber, setInitLotNumber] = useState('')
   const [initQuantity, setInitQuantity] = useState('')
 
@@ -55,6 +57,7 @@ export function ProductForm({ open, onOpenChange, shopId, editProduct }: Product
       color_code: '',
       color_name: '',
       unit: 'ball',
+      purchase_price: 0,
       price: 0,
       alert_threshold: 0,
     },
@@ -68,6 +71,7 @@ export function ProductForm({ open, onOpenChange, shopId, editProduct }: Product
         color_code: editProduct.color_code,
         color_name: editProduct.color_name,
         unit: editProduct.unit,
+        purchase_price: editProduct.purchase_price ?? 0,
         price: editProduct.price,
         alert_threshold: editProduct.alert_threshold,
       })
@@ -88,7 +92,6 @@ export function ProductForm({ open, onOpenChange, shopId, editProduct }: Product
       } else {
         const product = await createProduct.mutateAsync({ shop_id: shopId, ...values })
 
-        // 초기 입고: 로트번호와 수량이 모두 입력된 경우
         const qty = Number(initQuantity)
         if (initLotNumber.trim() && qty > 0 && product) {
           const supabase = createClient()
@@ -111,6 +114,8 @@ export function ProductForm({ open, onOpenChange, shopId, editProduct }: Product
               toast.error('초기 입고 실패: ' + stockError.message)
             } else {
               toast.success(`초기 입고 완료 (${qty}${values.unit === 'ball' ? '볼' : 'g'})`)
+              // lot/stock 완료 후 쿼리 재무효화 → 올바른 재고 표시
+              await qc.invalidateQueries({ queryKey: ['products'] })
             }
           }
         }
@@ -150,12 +155,14 @@ export function ProductForm({ open, onOpenChange, shopId, editProduct }: Product
           {/* 색상 코드 / 색상명 */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label>색상 번호</Label>
+              <Label>색상 번호 *</Label>
               <Input placeholder="예: #101" {...register('color_code')} />
+              {errors.color_code && <p className="text-xs text-destructive">{errors.color_code.message}</p>}
             </div>
             <div className="space-y-1">
-              <Label>색상명</Label>
+              <Label>색상명 *</Label>
               <Input placeholder="예: 레드" {...register('color_name')} />
+              {errors.color_name && <p className="text-xs text-destructive">{errors.color_name.message}</p>}
             </div>
           </div>
 
@@ -179,16 +186,24 @@ export function ProductForm({ open, onOpenChange, shopId, editProduct }: Product
             />
           </div>
 
-          {/* 단가 / 알림 임계값 */}
+          {/* 구매단가 / 판매단가 */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label>판매 단가 (원)</Label>
-              <Input type="number" min={0} {...register('price', { valueAsNumber: true })} />
+              <Label>구매 단가 (원) *</Label>
+              <Input type="number" min={0} {...register('purchase_price', { valueAsNumber: true })} />
+              {errors.purchase_price && <p className="text-xs text-destructive">{errors.purchase_price.message}</p>}
             </div>
             <div className="space-y-1">
-              <Label>재고 부족 알림</Label>
-              <Input type="number" min={0} placeholder="0=미사용" {...register('alert_threshold', { valueAsNumber: true })} />
+              <Label>판매 단가 (원) *</Label>
+              <Input type="number" min={0} {...register('price', { valueAsNumber: true })} />
+              {errors.price && <p className="text-xs text-destructive">{errors.price.message}</p>}
             </div>
+          </div>
+
+          {/* 재고 부족 알림 */}
+          <div className="space-y-1">
+            <Label>재고 부족 알림 수량</Label>
+            <Input type="number" min={0} placeholder="0=미사용" {...register('alert_threshold', { valueAsNumber: true })} />
           </div>
 
           {/* 초기 입고 섹션 (신규 등록 시에만) */}

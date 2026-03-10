@@ -104,7 +104,7 @@ export default function ProductDetailPage({ params }: PageProps) {
         <div className="max-w-3xl mx-auto space-y-6">
 
           {/* 요약 카드 */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <Card>
               <CardContent className="pt-4 pb-4">
                 <div className="flex items-center gap-2 text-muted-foreground mb-1">
@@ -133,9 +133,21 @@ export default function ProductDetailPage({ params }: PageProps) {
               <CardContent className="pt-4 pb-4">
                 <div className="flex items-center gap-2 text-muted-foreground mb-1">
                   <Tag size={14} />
+                  <span className="text-xs">구매 단가</span>
+                </div>
+                <p className="text-lg font-bold">
+                  {(product.purchase_price ?? 0).toLocaleString()}
+                  <span className="text-sm font-normal text-muted-foreground ml-1">원</span>
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <Tag size={14} />
                   <span className="text-xs">판매 단가</span>
                 </div>
-                <p className="text-2xl font-bold">
+                <p className="text-lg font-bold">
                   {product.price.toLocaleString()}
                   <span className="text-sm font-normal text-muted-foreground ml-1">원</span>
                 </p>

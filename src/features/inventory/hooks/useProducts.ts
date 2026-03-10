@@ -46,6 +46,7 @@ interface CreateProductInput {
   color_name: string
   unit: 'ball' | 'g'
   price: number
+  purchase_price: number
   alert_threshold: number
 }
 
@@ -78,6 +79,7 @@ interface UpdateProductInput {
   color_name?: string
   unit?: 'ball' | 'g'
   price?: number
+  purchase_price?: number
   alert_threshold?: number
 }
 
