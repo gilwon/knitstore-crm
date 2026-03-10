@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSignIn } from '../hooks/useAuth'
 import Link from 'next/link'
+import { Loader2 } from 'lucide-react'
 
 const schema = z.object({
   email: z.string().email('올바른 이메일을 입력해주세요'),
@@ -24,7 +25,16 @@ export function LoginForm() {
   })
 
   return (
-    <Card className="w-full max-w-sm">
+    <>
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">로그인 중...</p>
+          </div>
+        </div>
+      )}
+      <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">🧶 KnitStore</CardTitle>
         <CardDescription>공방 관리 시스템에 로그인하세요</CardDescription>
@@ -53,5 +63,6 @@ export function LoginForm() {
         </CardFooter>
       </form>
     </Card>
+    </>
   )
 }
