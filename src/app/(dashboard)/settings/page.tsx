@@ -61,7 +61,7 @@ export default function SettingsPage() {
 
       {/* 본문 */}
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-lg mx-auto space-y-4">
+        <div className="space-y-4">
 
           {/* 공방 정보 */}
           <Card>

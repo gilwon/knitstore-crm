@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Package, Users, ShoppingCart, Receipt, Settings, LogOut } from 'lucide-react'
+import { Package, Users, ShoppingCart, Receipt, Settings, LogOut, Sun, Moon } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useSignOut } from '@/features/auth/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
@@ -21,11 +22,12 @@ interface AppSidebarProps {
 export function AppSidebar({ shopName }: AppSidebarProps) {
   const pathname = usePathname()
   const { signOut } = useSignOut()
+  const { theme, setTheme } = useTheme()
 
   return (
     <aside className="flex flex-col w-56 h-full bg-sidebar border-r border-sidebar-border shrink-0">
       {/* 공방 헤더 */}
-      <div className="px-4 py-5 border-b border-sidebar-border">
+      <Link href="/dashboard" className="block px-4 py-5 border-b border-sidebar-border hover:bg-sidebar-accent transition-colors">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-md bg-sidebar-primary flex items-center justify-center shrink-0">
             <span className="text-xs text-sidebar-primary-foreground font-bold">K</span>
@@ -35,7 +37,7 @@ export function AppSidebar({ shopName }: AppSidebarProps) {
             <p className="text-xs text-muted-foreground">KnitStore Manager</p>
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* 내비게이션 */}
       <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
@@ -59,8 +61,17 @@ export function AppSidebar({ shopName }: AppSidebarProps) {
         })}
       </nav>
 
-      {/* 로그아웃 */}
-      <div className="p-2 border-t border-sidebar-border">
+      {/* 하단 버튼 */}
+      <div className="p-2 border-t border-sidebar-border space-y-0.5">
+        <button
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground w-full transition-colors"
+        >
+          <Sun size={16} strokeWidth={1.8} className="dark:hidden" />
+          <Moon size={16} strokeWidth={1.8} className="hidden dark:block" />
+          <span className="dark:hidden">다크 모드</span>
+          <span className="hidden dark:block">라이트 모드</span>
+        </button>
         <button
           onClick={signOut}
           className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground w-full transition-colors"
