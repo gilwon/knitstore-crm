@@ -43,9 +43,11 @@ export default function PosPage() {
   return (
     <div className="flex flex-col h-full">
       {/* 페이지 헤더 */}
-      <div className="px-6 py-4 border-b shrink-0">
-        <h1 className="text-xl font-semibold">POS</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">실 판매 또는 수강료를 결제합니다</p>
+      <div className="flex items-center px-6 h-[68px] border-b shrink-0">
+        <div>
+          <h1 className="text-xl font-semibold">POS</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">실 판매 또는 수강료를 결제합니다</p>
+        </div>
       </div>
 
       {/* 탭 전환 */}

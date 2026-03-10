@@ -54,9 +54,11 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col h-full">
       {/* 페이지 헤더 */}
-      <div className="px-6 py-4 border-b shrink-0">
-        <h1 className="text-xl font-semibold">설정</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">공방 정보 및 계정을 관리합니다</p>
+      <div className="flex items-center px-6 h-[68px] border-b shrink-0">
+        <div>
+          <h1 className="text-xl font-semibold">설정</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">공방 정보 및 계정을 관리합니다</p>
+        </div>
       </div>
 
       {/* 본문 */}

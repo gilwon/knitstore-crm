@@ -40,7 +40,7 @@ export default function StudentsPage() {
   return (
     <div className="flex flex-col h-full">
       {/* 페이지 헤더 */}
-      <div className="flex items-center justify-between px-6 py-4 border-b shrink-0">
+      <div className="flex items-center justify-between px-6 h-[68px] border-b shrink-0">
         <div>
           <h1 className="text-xl font-semibold">수강생</h1>
           <p className="text-sm text-muted-foreground mt-0.5">

@@ -45,3 +45,18 @@ src/features/{feature}/
 - Movement query: per-product (broader than design's per-lot)
 - checkLotMix: impl uses (lots: Lot[], qty) not (productId, qty)
 - ExcelImportDialog: direct supabase access from component (minor arch violation)
+
+## Auth/Supabase Analysis (2026-03-10)
+- **v0.1: 81% (25/31) -> v0.2: 100% (31/31)**
+- Architecture: 100% | Convention: 100%
+- Report: `docs/03-analysis/supabase.analysis.md`
+
+### All Issues Resolved (v0.2)
+- Middleware: `src/proxy.ts` deleted, `src/middleware.ts` created with correct export
+- Redirect: all 3 locations unified to `/dashboard` (middleware, useSignIn, page.tsx)
+- Auth layout: `bg-slate-50` -> `bg-background` (dark mode supported)
+- `.env.example`: created with 2 env vars
+
+### Remaining Doc-Only Gap
+- Design doc Section 11.1 still says `redirect to /inventory` -- needs update to `/dashboard`
+- Design doc missing `/dashboard` page in Screen Map (Section 5.1)

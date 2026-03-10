@@ -70,7 +70,7 @@ export default function ProductDetailPage({ params }: PageProps) {
   return (
     <div className="flex flex-col h-full">
       {/* 페이지 헤더 */}
-      <div className="flex items-center gap-3 px-6 py-4 border-b shrink-0">
+      <div className="flex items-center gap-3 px-6 h-[68px] border-b shrink-0">
         <Link href="/inventory">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="w-4 h-4" />

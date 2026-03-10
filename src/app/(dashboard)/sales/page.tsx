@@ -113,7 +113,7 @@ export default function SalesPage() {
   return (
     <div className="flex flex-col h-full">
       {/* 페이지 헤더 */}
-      <div className="flex items-center justify-between px-6 py-4 border-b shrink-0 gap-3 flex-wrap">
+      <div className="flex items-center justify-between px-6 min-h-[68px] border-b shrink-0 gap-3 flex-wrap py-3">
         <div>
           <h1 className="text-xl font-semibold">판매 내역</h1>
           <p className="text-sm text-muted-foreground mt-0.5">판매 기록 및 통계를 조회합니다</p>
