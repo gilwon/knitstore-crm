@@ -3,17 +3,23 @@
 import { useState } from 'react'
 import { use } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Users, BookOpen, CalendarCheck, Plus, Pencil } from 'lucide-react'
+import { ArrowLeft, Users, BookOpen, CalendarCheck, Plus, Pencil, Trash2 } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { AttendanceButton } from '@/features/students/components/AttendanceButton'
 import { AttendanceHistory } from '@/features/students/components/AttendanceHistory'
 import { SubscriptionForm } from '@/features/students/components/SubscriptionForm'
 import { StudentForm } from '@/features/students/components/StudentForm'
 import { useStudent } from '@/features/students/hooks/useStudents'
 import { useShop } from '@/features/inventory/hooks/useShop'
+import { useDeleteSubscription } from '@/features/students/hooks/useSubscriptions'
 import type { Subscription } from '@/types/database'
 
 interface PageProps {
@@ -43,6 +49,8 @@ export default function StudentDetailPage({ params }: PageProps) {
   const [editFormOpen, setEditFormOpen] = useState(false)
   const [editSubOpen, setEditSubOpen] = useState(false)
   const [editingSub, setEditingSub] = useState<Subscription | null>(null)
+  const [deleteSubTarget, setDeleteSubTarget] = useState<Subscription | null>(null)
+  const deleteSub = useDeleteSubscription()
 
   if (isLoading) {
     return (
@@ -203,6 +211,14 @@ export default function StudentDetailPage({ params }: PageProps) {
                           >
                             <Pencil size={13} />
                           </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                            onClick={() => setDeleteSubTarget(sub)}
+                          >
+                            <Trash2 size={13} />
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -247,6 +263,31 @@ export default function StudentDetailPage({ params }: PageProps) {
           editSubscription={editingSub}
         />
       )}
+
+      <AlertDialog open={!!deleteSubTarget} onOpenChange={(v) => { if (!v) setDeleteSubTarget(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>수강권 삭제</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteSubTarget?.type === 'count' ? '횟수제' : '기간제'} 수강권을 삭제합니다.
+              연결된 출석 이력도 함께 삭제됩니다. 계속하시겠습니까?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-white hover:bg-destructive/90"
+              onClick={async () => {
+                if (!deleteSubTarget) return
+                await deleteSub.mutateAsync({ id: deleteSubTarget.id, studentId: student.id })
+                setDeleteSubTarget(null)
+              }}
+            >
+              삭제
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {shop && (
         <StudentForm

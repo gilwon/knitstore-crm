@@ -60,6 +60,24 @@ export function useUpdateSubscription() {
   })
 }
 
+export function useDeleteSubscription() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, studentId }: { id: string; studentId: string }) => {
+      const supabase = createClient()
+      const { error } = await supabase.from('subscriptions').delete().eq('id', id)
+      if (error) throw error
+      return studentId
+    },
+    onSuccess: (studentId) => {
+      toast.success('수강권이 삭제되었습니다')
+      qc.invalidateQueries({ queryKey: ['students'] })
+      qc.invalidateQueries({ queryKey: ['students', studentId] })
+    },
+    onError: () => toast.error('수강권 삭제에 실패했습니다'),
+  })
+}
+
 export function useCreateSubscription() {
   const qc = useQueryClient()
   return useMutation({
