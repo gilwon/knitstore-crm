@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { use } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Users, BookOpen, CalendarCheck, Plus } from 'lucide-react'
+import { ArrowLeft, Users, BookOpen, CalendarCheck, Plus, Pencil } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,6 +14,7 @@ import { SubscriptionForm } from '@/features/students/components/SubscriptionFor
 import { StudentForm } from '@/features/students/components/StudentForm'
 import { useStudent } from '@/features/students/hooks/useStudents'
 import { useShop } from '@/features/inventory/hooks/useShop'
+import type { Subscription } from '@/types/database'
 
 interface PageProps {
   params: Promise<{ studentId: string }>
@@ -40,6 +41,8 @@ export default function StudentDetailPage({ params }: PageProps) {
 
   const [subFormOpen, setSubFormOpen] = useState(false)
   const [editFormOpen, setEditFormOpen] = useState(false)
+  const [editSubOpen, setEditSubOpen] = useState(false)
+  const [editingSub, setEditingSub] = useState<Subscription | null>(null)
 
   if (isLoading) {
     return (
@@ -61,7 +64,6 @@ export default function StudentDetailPage({ params }: PageProps) {
     )
   }
 
-  const activeSub = student.subscriptions?.find((s) => s.status === 'active') ?? null
   const attendances = student.attendances ?? []
   const subscriptions = student.subscriptions ?? []
 
@@ -87,7 +89,7 @@ export default function StudentDetailPage({ params }: PageProps) {
           <AttendanceButton
             studentId={student.id}
             studentName={student.name}
-            activeSubscription={activeSub}
+            subscriptions={subscriptions}
           />
         </div>
       </div>
@@ -105,11 +107,14 @@ export default function StudentDetailPage({ params }: PageProps) {
                   <span className="text-xs">현재 수강권</span>
                 </div>
                 <p className="text-sm font-semibold">
-                  {activeSub
-                    ? activeSub.type === 'count'
-                      ? `${activeSub.remaining ?? 0}회 남음`
-                      : '기간제'
-                    : '없음'}
+                  {(() => {
+                    const activeSub = subscriptions.find((s) => s.status === 'active')
+                    return activeSub
+                      ? activeSub.type === 'count'
+                        ? `${activeSub.remaining ?? 0}회 남음`
+                        : '기간제'
+                      : '없음'
+                  })()}
                 </p>
               </CardContent>
             </Card>
@@ -186,9 +191,19 @@ export default function StudentDetailPage({ params }: PageProps) {
                             }
                           </p>
                         </div>
-                        <span className="text-sm font-medium shrink-0">
-                          {sub.price.toLocaleString()}원
-                        </span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-sm font-medium">
+                            {sub.price.toLocaleString()}원
+                          </span>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7"
+                            onClick={() => { setEditingSub(sub); setEditSubOpen(true) }}
+                          >
+                            <Pencil size={13} />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))
@@ -222,6 +237,16 @@ export default function StudentDetailPage({ params }: PageProps) {
         studentId={student.id}
         studentName={student.name}
       />
+
+      {editingSub && (
+        <SubscriptionForm
+          open={editSubOpen}
+          onOpenChange={(v) => { setEditSubOpen(v); if (!v) setEditingSub(null) }}
+          studentId={student.id}
+          studentName={student.name}
+          editSubscription={editingSub}
+        />
+      )}
 
       {shop && (
         <StudentForm

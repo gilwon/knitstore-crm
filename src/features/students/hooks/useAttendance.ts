@@ -11,16 +11,19 @@ export function useAttend() {
       studentId,
       subscriptionId,
       memo,
+      attendedAt,
     }: {
       studentId: string
       subscriptionId: string
       memo?: string
+      attendedAt?: string
     }) => {
       const supabase = createClient()
       const { data, error } = await supabase.rpc('process_attendance', {
         p_student_id: studentId,
         p_subscription_id: subscriptionId,
         p_memo: memo ?? null,
+        p_attended_at: attendedAt ? new Date(attendedAt).toISOString() : null,
       })
       if (error) throw error
       return data

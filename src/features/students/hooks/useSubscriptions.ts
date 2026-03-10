@@ -16,6 +16,50 @@ export interface CreateSubscriptionInput {
   price: number
 }
 
+export interface UpdateSubscriptionInput {
+  id: string
+  student_id: string
+  type: 'count' | 'period'
+  total_count?: number
+  remaining?: number
+  starts_at: string
+  expires_at?: string
+  price: number
+  status: 'active' | 'expired' | 'exhausted'
+}
+
+export function useUpdateSubscription() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: UpdateSubscriptionInput) => {
+      const supabase = createClient()
+      const payload: Database['public']['Tables']['subscriptions']['Update'] = {
+        type: input.type,
+        starts_at: input.starts_at,
+        price: input.price,
+        status: input.status,
+        total_count: input.type === 'count' ? (input.total_count ?? null) : null,
+        remaining: input.type === 'count' ? (input.remaining ?? null) : null,
+        expires_at: input.type === 'period' ? (input.expires_at ?? null) : null,
+      }
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .update(payload)
+        .eq('id', input.id)
+        .select()
+        .single()
+      if (error) throw error
+      return data
+    },
+    onSuccess: (_, vars) => {
+      toast.success('수강권이 수정되었습니다')
+      qc.invalidateQueries({ queryKey: ['students'] })
+      qc.invalidateQueries({ queryKey: ['students', vars.student_id] })
+    },
+    onError: () => toast.error('수강권 수정에 실패했습니다'),
+  })
+}
+
 export function useCreateSubscription() {
   const qc = useQueryClient()
   return useMutation({
