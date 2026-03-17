@@ -119,12 +119,14 @@ export function OnlineSaleTable({ sales, onEdit }: Props) {
                     {sale.sale_date.substring(5).replace('-', '.')}
                   </td>
                   <td className="py-2 pr-3">
-                    <p className="font-medium truncate max-w-[140px]">{sale.product_name}</p>
-                    {sale.order_number && (
-                      <p className="text-xs text-muted-foreground">
-                        ...{sale.order_number.slice(-8)}
-                      </p>
-                    )}
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-medium">{sale.product_name}</span>
+                      {sale.order_number && (
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          {sale.order_number}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="py-2 pr-3 text-right">{sale.sale_amount.toLocaleString()}</td>
                   <td className="py-2 pr-3 text-right">{c.totalIncome.toLocaleString()}</td>
