@@ -34,6 +34,7 @@ export function PackagingTemplateForm({ shopId, open, onOpenChange, editTemplate
   const isEdit = !!editTemplate
 
   const { register, control, handleSubmit, watch, reset, formState: { errors } } = useForm<FormValues>({
+    mode: 'onTouched',
     resolver: zodResolver(schema) as never,
     defaultValues: editTemplate
       ? { product_name: editTemplate.product_name, items: editTemplate.items as { name: string; cost: number }[] }

@@ -17,7 +17,7 @@ const schema = z.object({
   sale_date: z.string().min(1, '판매일을 입력하세요'),
   order_number: z.string(),
   product_name: z.string().min(1, '상품명을 입력하세요'),
-  sale_amount: z.coerce.number().int().min(0, '0 이상'),
+  sale_amount: z.coerce.number().int().min(1, '판매금액을 입력하세요'),
   shipping_income: z.coerce.number().int().min(0, '0 이상'),
   order_fee: z.coerce.number().int().min(0, '0 이상'),
   sales_fee: z.coerce.number().int().min(0, '0 이상'),
@@ -63,6 +63,7 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
   const isEdit = !!editSale
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<FormValues>({
+    mode: 'onTouched',
     resolver: zodResolver(schema) as never,
     defaultValues: editSale
       ? {
@@ -154,7 +155,7 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
             <legend className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">기본 정보</legend>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>판매일</Label>
+                <Label>판매일 *</Label>
                 <Input type="date" {...register('sale_date')} />
                 {errors.sale_date && <p className="text-xs text-destructive mt-1">{errors.sale_date.message}</p>}
               </div>
@@ -164,7 +165,7 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
               </div>
             </div>
             <div>
-              <Label>상품명</Label>
+              <Label>상품명 *</Label>
               <Input {...register('product_name')} placeholder="상품명" list="pkg-templates" />
               <datalist id="pkg-templates">
                 {packagingTemplates.map((t) => (
@@ -180,8 +181,9 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
             <legend className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">수입</legend>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>판매금액</Label>
+                <Label>판매금액 *</Label>
                 <Input type="number" {...register('sale_amount')} />
+                {errors.sale_amount && <p className="text-xs text-destructive mt-1">{errors.sale_amount.message}</p>}
               </div>
               <div>
                 <Label>택배비(수입)</Label>
