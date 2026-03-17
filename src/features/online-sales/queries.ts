@@ -58,6 +58,15 @@ export async function deleteOnlineSale(id: string) {
   if (error) throw error
 }
 
+export async function deleteOnlineSales(ids: string[]) {
+  const supabase = createClient()
+  const { error } = await supabase
+    .from('online_sales')
+    .delete()
+    .in('id', ids)
+  if (error) throw error
+}
+
 // === 포장비 템플릿 ===
 
 export async function fetchPackagingTemplates(shopId: string, type?: 'packaging' | 'product_cost' | 'material_cost') {

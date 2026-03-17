@@ -7,6 +7,7 @@ import {
   createOnlineSale,
   updateOnlineSale,
   deleteOnlineSale,
+  deleteOnlineSales,
 } from '../queries'
 import type { OnlineSaleInsert, OnlineSaleUpdate } from '../types'
 
@@ -63,6 +64,20 @@ export function useDeleteOnlineSale() {
     },
     onError: () => {
       toast.error('판매 삭제에 실패했습니다')
+    },
+  })
+}
+
+export function useDeleteOnlineSales() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids: string[]) => deleteOnlineSales(ids),
+    onSuccess: (_data, ids) => {
+      qc.invalidateQueries({ queryKey: KEYS.all })
+      toast.success(`${ids.length}건이 삭제되었습니다`)
+    },
+    onError: () => {
+      toast.error('일괄 삭제에 실패했습니다')
     },
   })
 }
