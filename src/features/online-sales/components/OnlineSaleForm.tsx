@@ -138,7 +138,15 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
         </SheetHeader>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          onKeyDown={(e) => { if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') e.preventDefault() }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+              e.preventDefault()
+              const form = e.currentTarget
+              const inputs = Array.from(form.querySelectorAll<HTMLElement>('input, select, textarea'))
+              const idx = inputs.indexOf(e.target as HTMLElement)
+              if (idx >= 0 && idx < inputs.length - 1) inputs[idx + 1].focus()
+            }
+          }}
           className="flex flex-col gap-4 px-4"
         >
           {/* 기본 정보 */}
