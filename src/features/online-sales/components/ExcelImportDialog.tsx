@@ -92,7 +92,8 @@ export function ExcelImportDialog({ shopId, open, onOpenChange }: Props) {
           } else if (key === 'order_number' || key === 'product_name' || key === 'memo') {
             record[key] = String(val ?? '')
           } else {
-            record[key] = Math.round(Number(val) || 0)
+            const str = String(val ?? '').replace(/,/g, '').trim()
+            record[key] = (str === '' || str === '-') ? 0 : Math.round(Number(str) || 0)
           }
         })
 
