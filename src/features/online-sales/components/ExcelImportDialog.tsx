@@ -55,10 +55,7 @@ export function ExcelImportDialog({ shopId, open, onOpenChange }: Props) {
   const validRows = parsedRows.filter((r) => r.errors.length === 0)
   const invalidRows = parsedRows.filter((r) => r.errors.length > 0)
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
+  const processFile = (file: File) => {
     const reader = new FileReader()
     reader.onload = (ev) => {
       const data = new Uint8Array(ev.target?.result as ArrayBuffer)
@@ -95,7 +92,7 @@ export function ExcelImportDialog({ shopId, open, onOpenChange }: Props) {
           } else if (key === 'order_number' || key === 'product_name' || key === 'memo') {
             record[key] = String(val ?? '')
           } else {
-            record[key] = Number(val) || 0
+            record[key] = Math.round(Number(val) || 0)
           }
         })
 
@@ -109,6 +106,19 @@ export function ExcelImportDialog({ shopId, open, onOpenChange }: Props) {
       setStep('preview')
     }
     reader.readAsArrayBuffer(file)
+  }
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    processFile(file)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files?.[0]
+    if (!file) return
+    processFile(file)
   }
 
   const handleImport = async () => {
@@ -150,6 +160,8 @@ export function ExcelImportDialog({ shopId, open, onOpenChange }: Props) {
             <div
               className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
               onClick={() => fileRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleDrop}
             >
               <Upload size={32} className="mx-auto mb-2 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">엑셀 파일을 선택하거나 드래그하세요</p>
