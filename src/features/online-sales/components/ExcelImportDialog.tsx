@@ -59,7 +59,7 @@ export function ExcelImportDialog({ shopId, open, onOpenChange }: Props) {
     const reader = new FileReader()
     reader.onload = (ev) => {
       const data = new Uint8Array(ev.target?.result as ArrayBuffer)
-      const wb = XLSX.read(data, { type: 'array', cellDates: true })
+      const wb = XLSX.read(data, { type: 'array' })
       const ws = wb.Sheets[wb.SheetNames[0]]
       const rows: unknown[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
 
@@ -83,9 +83,10 @@ export function ExcelImportDialog({ shopId, open, onOpenChange }: Props) {
         colMap.forEach((key, idx) => {
           const val = row[idx]
           if (key === 'sale_date') {
-            if (val instanceof Date) {
-              const d = val
-              record[key] = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+            if (typeof val === 'number') {
+              // Excel 시리얼 넘버 → 타임존 무관하게 직접 파싱
+              const parsed = XLSX.SSF.parse_date_code(val)
+              record[key] = `${parsed.y}-${String(parsed.m).padStart(2, '0')}-${String(parsed.d).padStart(2, '0')}`
             } else {
               record[key] = String(val ?? '').replace(/[./]/g, '-')
             }

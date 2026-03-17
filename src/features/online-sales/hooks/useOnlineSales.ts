@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
   fetchOnlineSales,
@@ -22,6 +22,8 @@ export function useOnlineSales(shopId: string, from?: string, to?: string) {
     queryKey: KEYS.list(shopId, from, to),
     queryFn: () => fetchOnlineSales(shopId, from, to),
     enabled: !!shopId,
+    staleTime: 1000 * 60,
+    placeholderData: keepPreviousData,
   })
 }
 
