@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Package, Users, ShoppingCart, Receipt, Settings, LogOut, Sun, Moon } from 'lucide-react'
+import { Package, Users, ShoppingCart, Receipt, Globe, Settings, LogOut, Sun, Moon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useSignOut } from '@/features/auth/hooks/useAuth'
 import { cn } from '@/lib/utils'
@@ -12,6 +12,7 @@ const navItems = [
   { href: '/students', label: '수강생', icon: Users },
   { href: '/pos', label: 'POS 판매', icon: ShoppingCart },
   { href: '/sales', label: '판매 내역', icon: Receipt },
+  { href: '/online-sales', label: '온라인 판매', icon: Globe },
   { href: '/settings', label: '설정', icon: Settings },
 ]
 

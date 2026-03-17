@@ -359,6 +359,106 @@ export interface Database {
           }
         ]
       }
+      packaging_templates: {
+        Row: {
+          id: string
+          shop_id: string
+          product_name: string
+          items: { name: string; cost: number }[]
+          total_cost: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          shop_id: string
+          product_name: string
+          items?: { name: string; cost: number }[]
+          total_cost?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          shop_id?: string
+          product_name?: string
+          items?: { name: string; cost: number }[]
+          total_cost?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'packaging_templates_shop_id_fkey'
+            columns: ['shop_id']
+            isOneToOne: false
+            referencedRelation: 'shops'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      online_sales: {
+        Row: {
+          id: string
+          shop_id: string
+          sale_date: string
+          order_number: string
+          product_name: string
+          sale_amount: number
+          shipping_income: number
+          order_fee: number
+          sales_fee: number
+          vat: number
+          product_cost: number
+          material_cost: number
+          packaging_cost: number
+          shipping_cost: number
+          memo: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          shop_id: string
+          sale_date?: string
+          order_number?: string
+          product_name: string
+          sale_amount?: number
+          shipping_income?: number
+          order_fee?: number
+          sales_fee?: number
+          vat?: number
+          product_cost?: number
+          material_cost?: number
+          packaging_cost?: number
+          shipping_cost?: number
+          memo?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          shop_id?: string
+          sale_date?: string
+          order_number?: string
+          product_name?: string
+          sale_amount?: number
+          shipping_income?: number
+          order_fee?: number
+          sales_fee?: number
+          vat?: number
+          product_cost?: number
+          material_cost?: number
+          packaging_cost?: number
+          shipping_cost?: number
+          memo?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'online_sales_shop_id_fkey'
+            columns: ['shop_id']
+            isOneToOne: false
+            referencedRelation: 'shops'
+            referencedColumns: ['id']
+          }
+        ]
+      }
     }
     Views: { [_ in never]: never }
     Functions: {
@@ -410,3 +510,5 @@ export type Subscription = Database['public']['Tables']['subscriptions']['Row']
 export type Attendance = Database['public']['Tables']['attendances']['Row']
 export type Sale = Database['public']['Tables']['sales']['Row']
 export type SaleItem = Database['public']['Tables']['sale_items']['Row']
+export type PackagingTemplate = Database['public']['Tables']['packaging_templates']['Row']
+export type OnlineSale = Database['public']['Tables']['online_sales']['Row']
