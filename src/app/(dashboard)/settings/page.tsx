@@ -180,6 +180,16 @@ export default function SettingsPage() {
               <CardDescription>네이버 커머스 API 자격 증명을 설정합니다</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
+              <div className="rounded-lg bg-muted/50 border p-3 text-sm space-y-2">
+                <p className="font-medium">API 키 확인 방법</p>
+                <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+                  <li><a href="https://commerce.naver.com" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">네이버 커머스센터</a>에 로그인</li>
+                  <li>좌측 메뉴 <span className="font-medium text-foreground">[도구]</span> → <span className="font-medium text-foreground">[API 관리]</span> 클릭</li>
+                  <li><span className="font-medium text-foreground">[애플리케이션 추가]</span> 버튼으로 새 앱 생성</li>
+                  <li>생성된 앱의 <span className="font-medium text-foreground">Client ID</span>와 <span className="font-medium text-foreground">Client Secret</span>을 아래에 입력</li>
+                </ol>
+                <p className="text-xs text-muted-foreground">※ 애플리케이션 권한에서 &quot;주문&quot; 관련 권한을 반드시 활성화해야 합니다</p>
+              </div>
               <div className="space-y-1.5">
                 <Label htmlFor="smartstore-client-id">Client ID</Label>
                 <Input
