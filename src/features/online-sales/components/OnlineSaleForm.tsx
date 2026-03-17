@@ -62,7 +62,7 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
   const updateMutation = useUpdateOnlineSale()
   const isEdit = !!editSale
 
-  const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<FormValues>({
+  const { register, handleSubmit, watch, setValue, reset, trigger, formState: { errors } } = useForm<FormValues>({
     mode: 'onTouched',
     resolver: zodResolver(schema) as never,
     defaultValues: editSale
@@ -139,12 +139,18 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
         </SheetHeader>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          onKeyDown={(e) => {
+          onKeyDown={async (e) => {
             if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
               e.preventDefault()
+              const input = e.target as HTMLInputElement
+              const name = input.name as keyof FormValues
+              if (name) {
+                const valid = await trigger(name)
+                if (!valid) return
+              }
               const form = e.currentTarget
               const inputs = Array.from(form.querySelectorAll<HTMLElement>('input, select, textarea'))
-              const idx = inputs.indexOf(e.target as HTMLElement)
+              const idx = inputs.indexOf(input)
               if (idx >= 0 && idx < inputs.length - 1) inputs[idx + 1].focus()
             }
           }}

@@ -33,7 +33,7 @@ export function PackagingTemplateForm({ shopId, open, onOpenChange, editTemplate
   const updateMutation = useUpdatePackagingTemplate()
   const isEdit = !!editTemplate
 
-  const { register, control, handleSubmit, watch, reset, formState: { errors } } = useForm<FormValues>({
+  const { register, control, handleSubmit, watch, reset, trigger, formState: { errors } } = useForm<FormValues>({
     mode: 'onTouched',
     resolver: zodResolver(schema) as never,
     defaultValues: editTemplate
@@ -74,12 +74,18 @@ export function PackagingTemplateForm({ shopId, open, onOpenChange, editTemplate
         </SheetHeader>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          onKeyDown={(e) => {
+          onKeyDown={async (e) => {
             if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
               e.preventDefault()
+              const input = e.target as HTMLInputElement
+              const name = input.name as keyof FormValues | `items.${number}.name` | `items.${number}.cost`
+              if (name) {
+                const valid = await trigger(name as never)
+                if (!valid) return
+              }
               const form = e.currentTarget
               const inputs = Array.from(form.querySelectorAll<HTMLElement>('input, select, textarea'))
-              const idx = inputs.indexOf(e.target as HTMLElement)
+              const idx = inputs.indexOf(input)
               if (idx >= 0 && idx < inputs.length - 1) inputs[idx + 1].focus()
             }
           }}
