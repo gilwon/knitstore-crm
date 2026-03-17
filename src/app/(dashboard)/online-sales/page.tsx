@@ -24,9 +24,11 @@ function getPresetRange(preset: DateRange): { from?: string; to?: string; label:
     case 'today':
       return { from: todayStr, to: todayStr, label: '오늘' }
     case 'week': {
-      const weekAgo = new Date(now)
-      weekAgo.setDate(weekAgo.getDate() - 7)
-      return { from: weekAgo.toISOString().split('T')[0], to: todayStr, label: '이번주' }
+      const sunday = new Date(now)
+      sunday.setDate(sunday.getDate() - sunday.getDay())
+      const saturday = new Date(sunday)
+      saturday.setDate(saturday.getDate() + 6)
+      return { from: sunday.toISOString().split('T')[0], to: saturday.toISOString().split('T')[0], label: '이번주' }
     }
     case 'month': {
       const monthStart = `${todayStr.substring(0, 7)}-01`
