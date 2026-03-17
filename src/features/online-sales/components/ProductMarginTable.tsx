@@ -27,6 +27,18 @@ export function ProductMarginTable({ items, sales = [] }: Props) {
       .sort((a, b) => a.sale_date.localeCompare(b.sale_date))
   }, [sales, selectedProduct])
 
+  const popupTotals = useMemo(() => {
+    let saleAmount = 0, totalFee = 0, totalCost = 0, profit = 0
+    for (const sale of productSales) {
+      const c = calcOnlineSale(sale)
+      saleAmount += sale.sale_amount
+      totalFee += c.totalFee
+      totalCost += c.totalCost
+      profit += c.profit
+    }
+    return { saleAmount, totalFee, totalCost, profit }
+  }, [productSales])
+
   if (items.length === 0) {
     return (
       <Card>
@@ -150,16 +162,16 @@ export function ProductMarginTable({ items, sales = [] }: Props) {
                   <tr className="border-t-2 font-medium">
                     <td colSpan={2} className="py-2 pr-3 text-right text-muted-foreground">합계 ({productSales.length}건)</td>
                     <td className="py-2 pr-3 text-right">
-                      {productSales.reduce((s, v) => s + v.sale_amount, 0).toLocaleString()}원
+                      {popupTotals.saleAmount.toLocaleString()}원
                     </td>
                     <td className="py-2 pr-3 text-right text-muted-foreground">
-                      {productSales.reduce((s, v) => s + calcOnlineSale(v).totalFee, 0).toLocaleString()}원
+                      {popupTotals.totalFee.toLocaleString()}원
                     </td>
                     <td className="py-2 pr-3 text-right text-muted-foreground">
-                      {productSales.reduce((s, v) => s + calcOnlineSale(v).totalCost, 0).toLocaleString()}원
+                      {popupTotals.totalCost.toLocaleString()}원
                     </td>
                     <td className="py-2 pr-3 text-right">
-                      {productSales.reduce((s, v) => s + calcOnlineSale(v).profit, 0).toLocaleString()}원
+                      {popupTotals.profit.toLocaleString()}원
                     </td>
                     <td></td>
                   </tr>

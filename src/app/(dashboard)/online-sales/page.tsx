@@ -96,7 +96,6 @@ export default function OnlineSalesPage() {
           </Button>
           {shopId && (
             <SmartstoreSyncButton
-              shopId={shopId}
               hasApiKeys={!!shop?.smartstore_client_id}
             />
           )}

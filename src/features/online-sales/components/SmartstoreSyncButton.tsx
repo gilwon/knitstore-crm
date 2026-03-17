@@ -22,7 +22,6 @@ import {
 import { useSmartstoreSync } from '@/features/online-sales/hooks/useSmartstoreSync'
 
 interface Props {
-  shopId: string
   hasApiKeys: boolean
 }
 
@@ -35,7 +34,7 @@ function getDefaultTo() {
   return new Date().toISOString().split('T')[0]
 }
 
-export function SmartstoreSyncButton({ shopId: _shopId, hasApiKeys }: Props) {
+export function SmartstoreSyncButton({ hasApiKeys }: Props) {
   const [open, setOpen] = useState(false)
   const [syncFrom, setSyncFrom] = useState(getDefaultFrom)
   const [syncTo, setSyncTo] = useState(getDefaultTo)

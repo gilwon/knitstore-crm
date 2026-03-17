@@ -206,7 +206,7 @@ export function OnlineSaleTable({ sales, onEdit }: Props) {
                     <td className="py-2 pr-3 text-right font-bold">{c.totalIncome.toLocaleString()}</td>
                     <td className="py-2 pr-3 text-right text-muted-foreground">{c.totalFee.toLocaleString()}</td>
                     <td className="py-2 pr-3 text-right text-muted-foreground">{c.totalCost.toLocaleString()}</td>
-                    <td className="py-2 pr-3 text-right font-bold text-destructive">
+                    <td className={`py-2 pr-3 text-right font-bold ${c.profit < 0 ? 'text-destructive' : ''}`}>
                       {c.profit.toLocaleString()}
                     </td>
                     <td className="py-2 pr-3 text-right">

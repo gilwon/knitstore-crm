@@ -32,38 +32,43 @@ export async function POST(request: Request) {
     // 3. 주문 조회
     const orders = await fetchNaverOrders(token, from, to)
 
-    // 4. 중복 체크 (기존 order_number 조회)
+    if (orders.length === 0) {
+      return Response.json({ synced: 0, skipped: 0, total: 0, errors: [] })
+    }
+
+    // 4-5. 중복 체크 + 원가 템플릿 조회 (병렬)
     const orderNumbers = orders.map((o) => o.productOrderId)
-    const { data: existing, error: existingError } = await supabase
-      .from('online_sales')
-      .select('order_number')
-      .eq('shop_id', shop.id)
-      .in('order_number', orderNumbers)
+    const [{ data: existing, error: existingError }, { data: templates, error: templatesError }] =
+      await Promise.all([
+        supabase.from('online_sales').select('order_number').eq('shop_id', shop.id).in('order_number', orderNumbers),
+        supabase.from('packaging_templates').select('product_name, type, total_cost').eq('shop_id', shop.id),
+      ])
 
     if (existingError) throw existingError
+    if (templatesError) throw templatesError
 
     const existingSet = new Set((existing ?? []).map((e) => e.order_number))
 
-    // 5. 원가 템플릿 조회
-    const { data: templates, error: templatesError } = await supabase
-      .from('packaging_templates')
-      .select('product_name, type, total_cost')
-      .eq('shop_id', shop.id)
-
-    if (templatesError) throw templatesError
-
-    // 6. 신규 주문만 변환 + INSERT
+    // 6. 신규 주문만 변환 + 벌크 INSERT
     const newOrders = orders.filter((o) => !existingSet.has(o.productOrderId))
     const inserts = newOrders.map((o) =>
       mapNaverOrderToSale(o, shop.id, templates ?? [])
     )
 
-    const errors: string[] = []
     let synced = 0
-    for (const input of inserts) {
-      const { error } = await supabase.from('online_sales').insert(input)
-      if (error) errors.push(`${input.order_number}: ${error.message}`)
-      else synced++
+    const errors: string[] = []
+    if (inserts.length > 0) {
+      const { error } = await supabase.from('online_sales').insert(inserts)
+      if (error) {
+        // 벌크 실패 시 개별 INSERT 폴백
+        for (const input of inserts) {
+          const { error: itemError } = await supabase.from('online_sales').insert(input)
+          if (itemError) errors.push(`${input.order_number}: ${itemError.message}`)
+          else synced++
+        }
+      } else {
+        synced = inserts.length
+      }
     }
 
     return Response.json({
