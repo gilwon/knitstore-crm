@@ -84,6 +84,28 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
       : defaultValues,
   })
 
+  useEffect(() => {
+    if (editSale) {
+      reset({
+        sale_date: editSale.sale_date,
+        order_number: editSale.order_number,
+        product_name: editSale.product_name,
+        sale_amount: editSale.sale_amount,
+        shipping_income: editSale.shipping_income,
+        order_fee: editSale.order_fee,
+        sales_fee: editSale.sales_fee,
+        vat: editSale.vat,
+        product_cost: editSale.product_cost,
+        material_cost: editSale.material_cost,
+        packaging_cost: editSale.packaging_cost,
+        shipping_cost: editSale.shipping_cost,
+        memo: editSale.memo || '',
+      })
+    } else {
+      reset(defaultValues)
+    }
+  }, [editSale, reset])
+
   const watchAll = watch()
 
   // 원가 자동 반영 (포장비 + 실원가 + 부자재원가 각각 템플릿에서)
