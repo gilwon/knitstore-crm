@@ -94,6 +94,7 @@ export function OnlineSaleTable({ sales, onEdit }: Props) {
                 />
               </th>
               <th className="text-left py-2 pr-3 font-medium">판매일</th>
+              <th className="text-left py-2 pr-3 font-medium">주문번호</th>
               <th className="text-left py-2 pr-3 font-medium">상품명</th>
               <th className="text-right py-2 pr-3 font-medium">판매금액</th>
               <th className="text-right py-2 pr-3 font-medium">합계</th>
@@ -118,16 +119,10 @@ export function OnlineSaleTable({ sales, onEdit }: Props) {
                   <td className="py-2 pr-3 whitespace-nowrap">
                     {sale.sale_date.substring(5).replace('-', '.')}
                   </td>
-                  <td className="py-2 pr-3">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-medium">{sale.product_name}</span>
-                      {sale.order_number && (
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">
-                          {sale.order_number}
-                        </span>
-                      )}
-                    </div>
+                  <td className="py-2 pr-3 text-xs text-muted-foreground whitespace-nowrap">
+                    {sale.order_number || '-'}
                   </td>
+                  <td className="py-2 pr-3 font-medium">{sale.product_name}</td>
                   <td className="py-2 pr-3 text-right">{sale.sale_amount.toLocaleString()}</td>
                   <td className="py-2 pr-3 text-right">{c.totalIncome.toLocaleString()}</td>
                   <td className="py-2 pr-3 text-right text-muted-foreground">{c.totalFee.toLocaleString()}</td>
@@ -168,7 +163,7 @@ export function OnlineSaleTable({ sales, onEdit }: Props) {
           <tfoot>
             <tr className="border-t-2 font-medium">
               <td></td>
-              <td colSpan={3} className="py-2 pr-3 text-right text-muted-foreground">합계</td>
+              <td colSpan={4} className="py-2 pr-3 text-right text-muted-foreground">합계</td>
               <td className="py-2 pr-3 text-right">{totals.totalIncome.toLocaleString()}</td>
               <td colSpan={2}></td>
               <td className="py-2 pr-3 text-right">
