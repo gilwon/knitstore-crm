@@ -64,3 +64,25 @@ export function useUpdatePassword() {
     onError: (error: Error) => toast.error(error.message || '비밀번호 변경에 실패했습니다'),
   })
 }
+
+export function useUpdateSmartstoreKeys() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ shopId, clientId, clientSecret }: { shopId: string; clientId: string; clientSecret: string }) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('shops')
+        .update({ smartstore_client_id: clientId, smartstore_client_secret: clientSecret })
+        .eq('id', shopId)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['shop'] })
+      qc.invalidateQueries({ queryKey: ['shop', 'settings'] })
+      toast.success('스마트스토어 API 키가 저장되었습니다')
+    },
+    onError: () => {
+      toast.error('API 키 저장에 실패했습니다')
+    },
+  })
+}

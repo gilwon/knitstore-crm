@@ -56,3 +56,29 @@ export interface MonthlyProfitData {
   revenue: number
   profit: number
 }
+
+// 네이버 커머스 API
+export interface NaverOAuthToken {
+  access_token: string
+  expires_in: number
+  token_type: string
+}
+
+export interface NaverProductOrder {
+  productOrderId: string
+  productName: string
+  paymentDate: string
+  totalPaymentAmount: number
+  deliveryFeeAmount: number
+  platformCommission: number
+  salesCommission: number
+  knowledgeShoppingCommission: number
+  sellerBurdenDeliveryFee: number
+}
+
+export interface SyncResult {
+  synced: number
+  skipped: number
+  total: number
+  errors: string[]
+}

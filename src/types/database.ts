@@ -18,18 +18,24 @@ export interface Database {
           name: string
           owner_id: string
           created_at: string
+          smartstore_client_id: string | null
+          smartstore_client_secret: string | null
         }
         Insert: {
           id?: string
           name: string
           owner_id: string
           created_at?: string
+          smartstore_client_id?: string | null
+          smartstore_client_secret?: string | null
         }
         Update: {
           id?: string
           name?: string
           owner_id?: string
           created_at?: string
+          smartstore_client_id?: string | null
+          smartstore_client_secret?: string | null
         }
         Relationships: []
       }

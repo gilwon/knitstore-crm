@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { useShopSettings, useUpdateShopName, useUpdatePassword } from '@/features/settings/hooks/useSettings'
+import { useShopSettings, useUpdateShopName, useUpdatePassword, useUpdateSmartstoreKeys } from '@/features/settings/hooks/useSettings'
+import { useSmartstoreTest } from '@/features/online-sales/hooks/useSmartstoreSync'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -25,6 +26,19 @@ export default function SettingsPage() {
   const [newPw, setNewPw] = useState('')
   const [confirmPw, setConfirmPw] = useState('')
   const updatePassword = useUpdatePassword()
+
+  // 스마트스토어 API 키
+  const [clientId, setClientId] = useState('')
+  const [clientSecret, setClientSecret] = useState('')
+  const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle')
+  const [testError, setTestError] = useState('')
+  const updateSmartstoreKeys = useUpdateSmartstoreKeys()
+  const smartstoreTest = useSmartstoreTest()
+
+  useEffect(() => {
+    if (data?.shop.smartstore_client_id) setClientId(data.shop.smartstore_client_id)
+    if (data?.shop.smartstore_client_secret) setClientSecret(data.shop.smartstore_client_secret)
+  }, [data?.shop.smartstore_client_id, data?.shop.smartstore_client_secret])
 
   async function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -156,6 +170,82 @@ export default function SettingsPage() {
                   {updatePassword.isPending ? '변경 중...' : '비밀번호 변경'}
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+
+          {/* 스마트스토어 연동 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">스마트스토어 연동</CardTitle>
+              <CardDescription>네이버 커머스 API 자격 증명을 설정합니다</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="smartstore-client-id">Client ID</Label>
+                <Input
+                  id="smartstore-client-id"
+                  value={clientId}
+                  onChange={(e) => setClientId(e.target.value)}
+                  placeholder="네이버 커머스 API Client ID"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="smartstore-client-secret">Client Secret</Label>
+                <Input
+                  id="smartstore-client-secret"
+                  type="password"
+                  value={clientSecret}
+                  onChange={(e) => setClientSecret(e.target.value)}
+                  placeholder="네이버 커머스 API Client Secret"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  disabled={smartstoreTest.isPending || !clientId.trim() || !clientSecret.trim()}
+                  onClick={async () => {
+                    setTestStatus('testing')
+                    setTestError('')
+                    try {
+                      // 먼저 키를 저장한 뒤 테스트
+                      if (data?.shop.id) {
+                        await updateSmartstoreKeys.mutateAsync({
+                          shopId: data.shop.id,
+                          clientId,
+                          clientSecret,
+                        })
+                      }
+                      await smartstoreTest.mutateAsync()
+                      setTestStatus('success')
+                    } catch (err) {
+                      setTestStatus('error')
+                      setTestError(err instanceof Error ? err.message : '연결 실패')
+                    }
+                  }}
+                >
+                  {testStatus === 'testing' ? '테스트 중...' : '연결 테스트'}
+                </Button>
+                <Button
+                  disabled={updateSmartstoreKeys.isPending || !clientId.trim() || !clientSecret.trim()}
+                  onClick={() => {
+                    if (data?.shop.id) {
+                      updateSmartstoreKeys.mutate({
+                        shopId: data.shop.id,
+                        clientId,
+                        clientSecret,
+                      })
+                    }
+                  }}
+                >
+                  {updateSmartstoreKeys.isPending ? '저장 중...' : '저장'}
+                </Button>
+              </div>
+              {testStatus === 'success' && (
+                <p className="text-sm text-green-600">연결 성공</p>
+              )}
+              {testStatus === 'error' && (
+                <p className="text-sm text-destructive">연결 실패: {testError}</p>
+              )}
             </CardContent>
           </Card>
 

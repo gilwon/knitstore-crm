@@ -12,6 +12,7 @@ import { useOnlineSales } from '@/features/online-sales/hooks/useOnlineSales'
 import { useAllTemplates } from '@/features/online-sales/hooks/usePackagingTemplates'
 import { useShop } from '@/features/inventory/hooks/useShop'
 import { exportOnlineSales } from '@/features/online-sales/utils/exportExcel'
+import { SmartstoreSyncButton } from '@/features/online-sales/components/SmartstoreSyncButton'
 import type { OnlineSale } from '@/features/online-sales/types'
 
 type DateRange = 'today' | 'week' | 'month' | 'all' | 'custom'
@@ -93,6 +94,12 @@ export default function OnlineSalesPage() {
           >
             <Download size={14} className="mr-1" /> 엑셀 다운로드
           </Button>
+          {shopId && (
+            <SmartstoreSyncButton
+              shopId={shopId}
+              hasApiKeys={!!shop?.smartstore_client_id}
+            />
+          )}
 
           <div className="ml-auto flex gap-1">
             {(['today', 'week', 'month', 'all', 'custom'] as DateRange[]).map((preset) => (
