@@ -136,7 +136,11 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
         <SheetHeader>
           <SheetTitle>{isEdit ? '판매 수정' : '판매 등록'}</SheetTitle>
         </SheetHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') e.preventDefault() }}
+          className="flex flex-col gap-4 px-4"
+        >
           {/* 기본 정보 */}
           <fieldset className="space-y-3">
             <legend className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">기본 정보</legend>

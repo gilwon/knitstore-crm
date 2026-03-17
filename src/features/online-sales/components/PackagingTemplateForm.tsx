@@ -71,37 +71,47 @@ export function PackagingTemplateForm({ shopId, open, onOpenChange, editTemplate
         <SheetHeader>
           <SheetTitle>{isEdit ? '포장 템플릿 수정' : '포장 템플릿 추가'}</SheetTitle>
         </SheetHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') e.preventDefault() }}
+          className="flex flex-col gap-4 px-4"
+        >
           <div>
-            <Label>상품명</Label>
+            <Label>상품명 *</Label>
             <Input {...register('product_name')} placeholder="예: 오메가" />
             {errors.product_name && <p className="text-xs text-destructive mt-1">{errors.product_name.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label>포장재 구성</Label>
+            <Label>포장재 구성 *</Label>
             {fields.map((field, index) => (
-              <div key={field.id} className="flex items-center gap-2">
-                <Input
-                  {...register(`items.${index}.name`)}
-                  placeholder="포장재명"
-                  className="flex-1"
-                />
-                <Input
-                  {...register(`items.${index}.cost`)}
-                  type="number"
-                  placeholder="단가"
-                  className="w-24"
-                />
-                <span className="text-sm text-muted-foreground shrink-0">원</span>
-                {fields.length > 1 && (
-                  <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-                    <X size={14} />
-                  </Button>
+              <div key={field.id}>
+                <div className="flex items-center gap-2">
+                  <Input
+                    {...register(`items.${index}.name`)}
+                    placeholder="포장재명"
+                    className="flex-1"
+                  />
+                  <Input
+                    {...register(`items.${index}.cost`)}
+                    type="number"
+                    placeholder="단가"
+                    className="w-24"
+                  />
+                  <span className="text-sm text-muted-foreground shrink-0">원</span>
+                  {fields.length > 1 && (
+                    <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+                      <X size={14} />
+                    </Button>
+                  )}
+                </div>
+                {errors.items?.[index]?.name && (
+                  <p className="text-xs text-destructive mt-1">{errors.items[index].name?.message}</p>
                 )}
               </div>
             ))}
-            {errors.items && <p className="text-xs text-destructive">{errors.items.message || errors.items.root?.message}</p>}
+            {errors.items?.root && <p className="text-xs text-destructive">{errors.items.root.message}</p>}
+            {errors.items?.message && <p className="text-xs text-destructive">{errors.items.message}</p>}
             <Button type="button" variant="outline" size="sm" onClick={() => append({ name: '', cost: 0 })}>
               <Plus size={14} className="mr-1" /> 포장재 추가
             </Button>
