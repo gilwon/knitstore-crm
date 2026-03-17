@@ -203,13 +203,11 @@ export function OnlineSaleTable({ sales, onEdit }: Props) {
                     </td>
                     <td className="py-2 pr-3 font-medium">{sale.product_name}</td>
                     <td className="py-2 pr-3 text-right">{sale.sale_amount.toLocaleString()}</td>
-                    <td className="py-2 pr-3 text-right">{c.totalIncome.toLocaleString()}</td>
+                    <td className="py-2 pr-3 text-right font-bold">{c.totalIncome.toLocaleString()}</td>
                     <td className="py-2 pr-3 text-right text-muted-foreground">{c.totalFee.toLocaleString()}</td>
                     <td className="py-2 pr-3 text-right text-muted-foreground">{c.totalCost.toLocaleString()}</td>
-                    <td className="py-2 pr-3 text-right font-medium">
-                      <span className={c.profit < 0 ? 'text-destructive' : ''}>
-                        {c.profit.toLocaleString()}
-                      </span>
+                    <td className="py-2 pr-3 text-right font-bold text-destructive">
+                      {c.profit.toLocaleString()}
                     </td>
                     <td className="py-2 pr-3 text-right">
                       <Badge
@@ -240,20 +238,17 @@ export function OnlineSaleTable({ sales, onEdit }: Props) {
               })}
             </tbody>
             <tfoot>
-              <tr className="border-t-2 font-medium">
+              <tr className="border-t-2 text-base font-bold">
                 <td></td>
-                <td colSpan={4} className="py-2 pr-3 text-right text-muted-foreground">합계</td>
-                <td className="py-2 pr-3 text-right">{totals.totalIncome.toLocaleString()}</td>
+                <td colSpan={4} className="py-3 pr-3 text-right text-muted-foreground">합계</td>
+                <td className="py-3 pr-3 text-right">{totals.totalIncome.toLocaleString()}</td>
                 <td colSpan={2}></td>
-                <td className="py-2 pr-3 text-right">
-                  <span className={totals.totalProfit < 0 ? 'text-destructive' : ''}>
-                    {totals.totalProfit.toLocaleString()}
-                  </span>
+                <td className="py-3 pr-3 text-right text-lg text-destructive">
+                  {totals.totalProfit.toLocaleString()}
                 </td>
-                <td className="py-2 pr-3 text-right">
+                <td className="py-3 pr-3 text-right">
                   <Badge
                     variant={totals.avgMargin >= 30 ? 'default' : totals.avgMargin < 0 ? 'destructive' : 'secondary'}
-                    className="text-xs"
                   >
                     {totals.avgMargin.toFixed(1)}%
                   </Badge>

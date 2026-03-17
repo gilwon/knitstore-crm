@@ -107,7 +107,7 @@ export default function OnlineSalesDashboardPage() {
               saleCount={stats.saleCount}
             />
             <MonthlyProfitChart data={stats.monthlyData} />
-            <ProductMarginTable items={stats.productStats} />
+            <ProductMarginTable items={stats.productStats} sales={sales} />
           </div>
         )}
       </div>
