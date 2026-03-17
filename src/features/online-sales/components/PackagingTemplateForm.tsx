@@ -13,6 +13,8 @@ import type { PackagingTemplate } from '../types'
 
 const schema = z.object({
   product_name: z.string().min(1, '상품명을 입력하세요'),
+  product_cost: z.coerce.number().int().min(0, '0 이상'),
+  material_cost: z.coerce.number().int().min(0, '0 이상'),
   items: z.array(z.object({
     name: z.string().min(1, '포장재명을 입력하세요'),
     cost: z.coerce.number().int().min(0, '0 이상'),
@@ -37,8 +39,13 @@ export function PackagingTemplateForm({ shopId, open, onOpenChange, editTemplate
     mode: 'onTouched',
     resolver: zodResolver(schema) as never,
     defaultValues: editTemplate
-      ? { product_name: editTemplate.product_name, items: editTemplate.items as { name: string; cost: number }[] }
-      : { product_name: '', items: [{ name: '', cost: 0 }] },
+      ? {
+          product_name: editTemplate.product_name,
+          product_cost: editTemplate.product_cost,
+          material_cost: editTemplate.material_cost,
+          items: editTemplate.items as { name: string; cost: number }[],
+        }
+      : { product_name: '', product_cost: 0, material_cost: 0, items: [{ name: '', cost: 0 }] },
   })
 
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
@@ -50,17 +57,25 @@ export function PackagingTemplateForm({ shopId, open, onOpenChange, editTemplate
     if (isEdit && editTemplate) {
       await updateMutation.mutateAsync({
         id: editTemplate.id,
-        input: { product_name: values.product_name, items: values.items, total_cost: total },
+        input: {
+          product_name: values.product_name,
+          product_cost: values.product_cost,
+          material_cost: values.material_cost,
+          items: values.items,
+          total_cost: total,
+        },
       })
     } else {
       await createMutation.mutateAsync({
         shop_id: shopId,
         product_name: values.product_name,
+        product_cost: values.product_cost,
+        material_cost: values.material_cost,
         items: values.items,
         total_cost: total,
       })
     }
-    reset({ product_name: '', items: [{ name: '', cost: 0 }] })
+    reset({ product_name: '', product_cost: 0, material_cost: 0, items: [{ name: '', cost: 0 }] })
     onOpenChange(false)
   }
 
@@ -70,7 +85,7 @@ export function PackagingTemplateForm({ shopId, open, onOpenChange, editTemplate
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{isEdit ? '포장 템플릿 수정' : '포장 템플릿 추가'}</SheetTitle>
+          <SheetTitle>{isEdit ? '원가 템플릿 수정' : '원가 템플릿 추가'}</SheetTitle>
         </SheetHeader>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -79,7 +94,7 @@ export function PackagingTemplateForm({ shopId, open, onOpenChange, editTemplate
               e.preventDefault()
               const input = e.target as HTMLInputElement
               const form = e.currentTarget
-              const name = input.name as keyof FormValues | `items.${number}.name` | `items.${number}.cost`
+              const name = input.name
               if (name) {
                 const valid = await trigger(name as never)
                 if (!valid) return
@@ -97,6 +112,19 @@ export function PackagingTemplateForm({ shopId, open, onOpenChange, editTemplate
             {errors.product_name && <p className="text-xs text-destructive mt-1">{errors.product_name.message}</p>}
           </div>
 
+          {/* 실원가 / 부자재원가 */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>실원가</Label>
+              <Input type="number" {...register('product_cost')} placeholder="0" />
+            </div>
+            <div>
+              <Label>부자재원가</Label>
+              <Input type="number" {...register('material_cost')} placeholder="0" />
+            </div>
+          </div>
+
+          {/* 포장재 구성 */}
           <div className="space-y-2">
             <Label>포장재 구성 *</Label>
             {fields.map((field, index) => (

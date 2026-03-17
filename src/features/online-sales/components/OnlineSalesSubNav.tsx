@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 const tabs = [
   { href: '/online-sales', label: '판매 관리' },
   { href: '/online-sales/dashboard', label: '이익 분석' },
-  { href: '/online-sales/packaging', label: '포장비 설정' },
+  { href: '/online-sales/packaging', label: '원가 설정' },
 ]
 
 export function OnlineSalesSubNav() {

@@ -86,7 +86,7 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
 
   const watchAll = watch()
 
-  // 포장비 자동 반영
+  // 원가 자동 반영 (포장비 + 실원가 + 부자재원가)
   const productName = watch('product_name')
   useEffect(() => {
     if (isEdit) return
@@ -95,6 +95,8 @@ export function OnlineSaleForm({ shopId, open, onOpenChange, editSale, packaging
     )
     if (matched) {
       setValue('packaging_cost', matched.total_cost)
+      setValue('product_cost', matched.product_cost)
+      setValue('material_cost', matched.material_cost)
     }
   }, [productName, packagingTemplates, setValue, isEdit])
 

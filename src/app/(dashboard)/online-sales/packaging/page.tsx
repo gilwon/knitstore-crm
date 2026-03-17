@@ -39,7 +39,7 @@ export default function PackagingPage() {
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">{templates.length}개 템플릿</p>
           <Button size="sm" onClick={() => setFormOpen(true)}>
-            <Plus size={14} className="mr-1" /> 포장 템플릿 추가
+            <Plus size={14} className="mr-1" /> 원가 템플릿 추가
           </Button>
         </div>
 

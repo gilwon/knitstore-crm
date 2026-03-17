@@ -366,6 +366,8 @@ export interface Database {
           product_name: string
           items: { name: string; cost: number }[]
           total_cost: number
+          product_cost: number
+          material_cost: number
           created_at: string
         }
         Insert: {
@@ -374,6 +376,8 @@ export interface Database {
           product_name: string
           items?: { name: string; cost: number }[]
           total_cost?: number
+          product_cost?: number
+          material_cost?: number
           created_at?: string
         }
         Update: {
@@ -382,6 +386,8 @@ export interface Database {
           product_name?: string
           items?: { name: string; cost: number }[]
           total_cost?: number
+          product_cost?: number
+          material_cost?: number
           created_at?: string
         }
         Relationships: [
