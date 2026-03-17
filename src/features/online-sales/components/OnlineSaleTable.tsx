@@ -196,7 +196,7 @@ export function OnlineSaleTable({ sales, onEdit }: Props) {
                       />
                     </td>
                     <td className="py-2 pr-3 whitespace-nowrap">
-                      {sale.sale_date.substring(5).replace('-', '.')}
+                      {sale.sale_date.replace(/-/g, '.')}
                     </td>
                     <td className="py-2 pr-3 text-xs text-muted-foreground whitespace-nowrap">
                       {sale.order_number || '-'}
