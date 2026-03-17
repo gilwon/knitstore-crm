@@ -60,13 +60,15 @@ export async function deleteOnlineSale(id: string) {
 
 // === 포장비 템플릿 ===
 
-export async function fetchPackagingTemplates(shopId: string) {
+export async function fetchPackagingTemplates(shopId: string, type?: 'packaging' | 'product_cost' | 'material_cost') {
   const supabase = createClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('packaging_templates')
     .select('*')
     .eq('shop_id', shopId)
     .order('created_at', { ascending: false })
+  if (type) query = query.eq('type', type)
+  const { data, error } = await query
   if (error) throw error
   return data as PackagingTemplate[]
 }

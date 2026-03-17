@@ -9,7 +9,7 @@ import { OnlineSaleTable } from '@/features/online-sales/components/OnlineSaleTa
 import { OnlineSaleForm } from '@/features/online-sales/components/OnlineSaleForm'
 import { ExcelImportDialog } from '@/features/online-sales/components/ExcelImportDialog'
 import { useOnlineSales } from '@/features/online-sales/hooks/useOnlineSales'
-import { usePackagingTemplates } from '@/features/online-sales/hooks/usePackagingTemplates'
+import { useAllTemplates } from '@/features/online-sales/hooks/usePackagingTemplates'
 import { useShop } from '@/features/inventory/hooks/useShop'
 import { exportOnlineSales } from '@/features/online-sales/utils/exportExcel'
 import type { OnlineSale } from '@/features/online-sales/types'
@@ -56,7 +56,7 @@ export default function OnlineSalesPage() {
   }, [dateRange, customFrom, customTo])
 
   const { data: sales = [], isLoading } = useOnlineSales(shopId, from, to)
-  const { data: templates = [] } = usePackagingTemplates(shopId)
+  const { data: templates = [] } = useAllTemplates(shopId)
 
   const handleEdit = (sale: OnlineSale) => {
     setEditSale(sale)

@@ -9,17 +9,18 @@ import type { PackagingTemplate } from '../types'
 interface Props {
   templates: PackagingTemplate[]
   onEdit: (template: PackagingTemplate) => void
+  emptyMessage?: string
 }
 
-export function PackagingTemplateList({ templates, onEdit }: Props) {
+export function PackagingTemplateList({ templates, onEdit, emptyMessage = '등록된 템플릿이 없습니다' }: Props) {
   const deleteMutation = useDeletePackagingTemplate()
 
   if (templates.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
         <Package size={40} strokeWidth={1.2} className="mb-3" />
-        <p className="text-sm">등록된 원가 템플릿이 없습니다</p>
-        <p className="text-xs mt-1">상품별 원가를 미리 등록하면 판매 입력 시 자동 반영됩니다</p>
+        <p className="text-sm">{emptyMessage}</p>
+        <p className="text-xs mt-1">상품별로 미리 등록하면 판매 입력 시 자동 반영됩니다</p>
       </div>
     )
   }
@@ -48,22 +49,6 @@ export function PackagingTemplateList({ templates, onEdit }: Props) {
             </div>
           </CardHeader>
           <CardContent>
-            {(tpl.product_cost > 0 || tpl.material_cost > 0) && (
-              <div className="space-y-1 mb-2">
-                {tpl.product_cost > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">실원가</span>
-                    <span>{tpl.product_cost.toLocaleString()}원</span>
-                  </div>
-                )}
-                {tpl.material_cost > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">부자재원가</span>
-                    <span>{tpl.material_cost.toLocaleString()}원</span>
-                  </div>
-                )}
-              </div>
-            )}
             <div className="space-y-1 mb-2">
               {(tpl.items as { name: string; cost: number }[]).map((item, i) => (
                 <div key={i} className="flex justify-between text-sm">
@@ -73,7 +58,7 @@ export function PackagingTemplateList({ templates, onEdit }: Props) {
               ))}
             </div>
             <div className="border-t pt-2 flex justify-between text-sm font-medium">
-              <span>포장비 합계</span>
+              <span>합계</span>
               <span>{tpl.total_cost.toLocaleString()}원</span>
             </div>
           </CardContent>

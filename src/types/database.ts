@@ -364,30 +364,27 @@ export interface Database {
           id: string
           shop_id: string
           product_name: string
+          type: 'packaging' | 'product_cost' | 'material_cost'
           items: { name: string; cost: number }[]
           total_cost: number
-          product_cost: number
-          material_cost: number
           created_at: string
         }
         Insert: {
           id?: string
           shop_id: string
           product_name: string
+          type?: 'packaging' | 'product_cost' | 'material_cost'
           items?: { name: string; cost: number }[]
           total_cost?: number
-          product_cost?: number
-          material_cost?: number
           created_at?: string
         }
         Update: {
           id?: string
           shop_id?: string
           product_name?: string
+          type?: 'packaging' | 'product_cost' | 'material_cost'
           items?: { name: string; cost: number }[]
           total_cost?: number
-          product_cost?: number
-          material_cost?: number
           created_at?: string
         }
         Relationships: [
