@@ -62,7 +62,7 @@ export function ExcelImportDialog({ shopId, open, onOpenChange }: Props) {
     const reader = new FileReader()
     reader.onload = (ev) => {
       const data = new Uint8Array(ev.target?.result as ArrayBuffer)
-      const wb = XLSX.read(data, { type: 'array' })
+      const wb = XLSX.read(data, { type: 'array', cellDates: true })
       const ws = wb.Sheets[wb.SheetNames[0]]
       const rows: unknown[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
 
@@ -85,7 +85,14 @@ export function ExcelImportDialog({ shopId, open, onOpenChange }: Props) {
 
         colMap.forEach((key, idx) => {
           const val = row[idx]
-          if (key === 'sale_date' || key === 'order_number' || key === 'product_name' || key === 'memo') {
+          if (key === 'sale_date') {
+            if (val instanceof Date) {
+              const d = val
+              record[key] = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+            } else {
+              record[key] = String(val ?? '').replace(/[./]/g, '-')
+            }
+          } else if (key === 'order_number' || key === 'product_name' || key === 'memo') {
             record[key] = String(val ?? '')
           } else {
             record[key] = Number(val) || 0

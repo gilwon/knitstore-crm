@@ -51,8 +51,8 @@ export function MonthlyProfitChart({ data }: Props) {
               labelFormatter={(label) => formatMonth(String(label))}
             />
             <Legend formatter={(value) => (value === 'revenue' ? '매출' : '이익')} />
-            <Bar dataKey="revenue" fill="hsl(var(--muted-foreground) / 0.3)" radius={[3, 3, 0, 0]} />
-            <Bar dataKey="profit" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="revenue" fill="#3b82f6" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="profit" fill="#ef4444" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
