@@ -11,7 +11,7 @@ export function useOnboardingStatus() {
       const supabase = createClient()
 
       const [shop, products, students, sales] = await Promise.all([
-        supabase.from('shops').select('name').limit(1).single(),
+        supabase.from('shops').select('name, onboarding_completed').limit(1).single(),
         supabase.from('products').select('id', { count: 'exact', head: true }),
         supabase.from('students').select('id', { count: 'exact', head: true }),
         supabase.from('sales').select('id', { count: 'exact', head: true }),
@@ -32,7 +32,7 @@ export function useOnboardingStatus() {
         firstSaleCompleted,
         completedCount,
         totalCount: 4,
-        allCompleted: completedCount === 4,
+        allCompleted: shop.data?.onboarding_completed === true || completedCount === 4,
       }
     },
     staleTime: 5 * 60_000,
@@ -46,7 +46,7 @@ export function useCompleteOnboarding() {
       const supabase = createClient()
       const { error } = await supabase
         .from('shops')
-        .update({ onboarding_completed: true } as any)
+        .update({ onboarding_completed: true })
         .eq('id', shopId)
       if (error) throw error
     },

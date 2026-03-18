@@ -3,22 +3,35 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import type { CartItem } from '../types'
+import type { CartItem, PaymentMethod } from '../types'
 
 interface CheckoutInput {
   shopId: string
   items: CartItem[]
   studentId?: string | null
+  paymentMethod?: PaymentMethod
+  discountAmount?: number
+  discountType?: string | null
+  discountRate?: number | null
+  originalAmount?: number
 }
 
 export function useCheckout() {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ shopId, items, studentId }: CheckoutInput) => {
+    mutationFn: async ({
+      shopId, items, studentId,
+      paymentMethod = 'card',
+      discountAmount = 0,
+      discountType,
+      discountRate,
+      originalAmount,
+    }: CheckoutInput) => {
       const supabase = createClient()
 
-      const totalAmount = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+      const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+      const totalAmount = Math.max(0, subtotal - discountAmount)
 
       // 1. 판매 레코드 생성
       const { data: sale, error: saleError } = await supabase
@@ -28,6 +41,11 @@ export function useCheckout() {
           type: 'product_sale',
           total_amount: totalAmount,
           student_id: studentId ?? null,
+          payment_method: paymentMethod,
+          discount_amount: discountAmount,
+          discount_type: discountType ?? null,
+          discount_rate: discountRate ?? null,
+          original_amount: originalAmount ?? subtotal,
         })
         .select()
         .single()
@@ -67,6 +85,7 @@ export function useCheckout() {
       toast.success('결제가 완료되었습니다')
       qc.invalidateQueries({ queryKey: ['products'] })
       qc.invalidateQueries({ queryKey: ['sales'] })
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
     },
     onError: (err) => {
       const msg = err instanceof Error ? err.message : '결제 처리에 실패했습니다'

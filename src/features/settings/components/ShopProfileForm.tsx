@@ -67,7 +67,7 @@ export function ShopProfileForm({ shopId, shop }: ShopProfileFormProps) {
           address: values.address || null,
           business_hours: values.business_hours || null,
           business_number: values.business_number || null,
-        } as any)
+        })
         .eq('id', shopId)
       if (error) throw error
     },

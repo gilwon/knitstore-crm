@@ -20,6 +20,11 @@ export interface Database {
           created_at: string
           smartstore_client_id: string | null
           smartstore_client_secret: string | null
+          phone: string | null
+          address: string | null
+          business_hours: string | null
+          business_number: string | null
+          onboarding_completed: boolean
         }
         Insert: {
           id?: string
@@ -28,6 +33,11 @@ export interface Database {
           created_at?: string
           smartstore_client_id?: string | null
           smartstore_client_secret?: string | null
+          phone?: string | null
+          address?: string | null
+          business_hours?: string | null
+          business_number?: string | null
+          onboarding_completed?: boolean
         }
         Update: {
           id?: string
@@ -36,6 +46,11 @@ export interface Database {
           created_at?: string
           smartstore_client_id?: string | null
           smartstore_client_secret?: string | null
+          phone?: string | null
+          address?: string | null
+          business_hours?: string | null
+          business_number?: string | null
+          onboarding_completed?: boolean
         }
         Relationships: []
       }
@@ -299,6 +314,12 @@ export interface Database {
           type: 'product_sale' | 'class_fee'
           total_amount: number
           student_id: string | null
+          payment_method: string | null
+          discount_amount: number
+          discount_type: string | null
+          discount_rate: number | null
+          original_amount: number | null
+          memo: string | null
           created_at: string
         }
         Insert: {
@@ -307,6 +328,12 @@ export interface Database {
           type: 'product_sale' | 'class_fee'
           total_amount?: number
           student_id?: string | null
+          payment_method?: string | null
+          discount_amount?: number
+          discount_type?: string | null
+          discount_rate?: number | null
+          original_amount?: number | null
+          memo?: string | null
           created_at?: string
         }
         Update: {
@@ -315,6 +342,12 @@ export interface Database {
           type?: 'product_sale' | 'class_fee'
           total_amount?: number
           student_id?: string | null
+          payment_method?: string | null
+          discount_amount?: number
+          discount_type?: string | null
+          discount_rate?: number | null
+          original_amount?: number | null
+          memo?: string | null
           created_at?: string
         }
         Relationships: [
@@ -323,6 +356,47 @@ export interface Database {
             columns: ['shop_id']
             isOneToOne: false
             referencedRelation: 'shops'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      refunds: {
+        Row: {
+          id: string
+          sale_id: string
+          shop_id: string
+          refund_amount: number
+          reason: string | null
+          refunded_items: Json
+          payment_method: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          sale_id: string
+          shop_id: string
+          refund_amount: number
+          reason?: string | null
+          refunded_items?: Json
+          payment_method?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          sale_id?: string
+          shop_id?: string
+          refund_amount?: number
+          reason?: string | null
+          refunded_items?: Json
+          payment_method?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'refunds_sale_id_fkey'
+            columns: ['sale_id']
+            isOneToOne: false
+            referencedRelation: 'sales'
             referencedColumns: ['id']
           }
         ]
@@ -503,6 +577,17 @@ export interface Database {
         Args: { p_attendance_id: string }
         Returns: void
       }
+      process_refund: {
+        Args: {
+          p_sale_id: string
+          p_shop_id: string
+          p_refund_amount: number
+          p_reason?: string | null
+          p_refunded_items?: Json
+          p_payment_method?: string | null
+        }
+        Returns: string
+      }
     }
     Enums: { [_ in never]: never }
     CompositeTypes: { [_ in never]: never }
@@ -521,3 +606,4 @@ export type Sale = Database['public']['Tables']['sales']['Row']
 export type SaleItem = Database['public']['Tables']['sale_items']['Row']
 export type PackagingTemplate = Database['public']['Tables']['packaging_templates']['Row']
 export type OnlineSale = Database['public']['Tables']['online_sales']['Row']
+export type Refund = Database['public']['Tables']['refunds']['Row']

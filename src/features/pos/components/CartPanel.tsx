@@ -29,7 +29,14 @@ export function CartPanel({ shopId }: CartPanelProps) {
 
   async function handleCheckout() {
     if (items.length === 0) return
-    await checkout.mutateAsync({ shopId, items, studentId: null })
+    await checkout.mutateAsync({
+      shopId,
+      items,
+      studentId: null,
+      paymentMethod,
+      discountAmount: totalDiscount,
+      originalAmount: subtotal,
+    })
     clear()
     setStudentName('')
   }

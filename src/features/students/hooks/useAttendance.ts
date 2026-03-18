@@ -32,6 +32,7 @@ export function useAttend() {
       toast.success('출석이 체크되었습니다')
       qc.invalidateQueries({ queryKey: ['students'] })
       qc.invalidateQueries({ queryKey: ['students', vars.studentId] })
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
     },
     onError: (err: Error) => toast.error(err.message ?? '출석 체크에 실패했습니다'),
   })
