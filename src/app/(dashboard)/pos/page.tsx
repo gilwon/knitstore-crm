@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -8,34 +7,15 @@ import { useShop } from '@/features/inventory/hooks/useShop'
 import { ProductSearchPanel } from '@/features/pos/components/ProductSearchPanel'
 import { CartPanel } from '@/features/pos/components/CartPanel'
 import { PosClassTab } from '@/features/pos/components/PosClassTab'
+import { useCartStore } from '@/features/pos/store'
 import type { CartItem } from '@/features/pos/types'
 
 export default function PosPage() {
   const { data: shop } = useShop()
-  const [cartItems, setCartItems] = useState<CartItem[]>([])
+  const addItem = useCartStore((s) => s.addItem)
 
   function handleAdd(item: CartItem) {
-    setCartItems((prev) => {
-      const existing = prev.find((i) => i.lotId === item.lotId)
-      if (existing) {
-        return prev.map((i) =>
-          i.lotId === item.lotId
-            ? { ...i, quantity: Math.min(i.maxStock, i.quantity + item.quantity) }
-            : i
-        )
-      }
-      return [...prev, item]
-    })
-  }
-
-  function handleUpdateQty(lotId: string, quantity: number) {
-    if (quantity < 1) {
-      setCartItems((prev) => prev.filter((i) => i.lotId !== lotId))
-      return
-    }
-    setCartItems((prev) =>
-      prev.map((i) => (i.lotId === lotId ? { ...i, quantity } : i))
-    )
+    addItem(item)
   }
 
   if (!shop) return null
@@ -75,17 +55,9 @@ export default function PosPage() {
               </Card>
 
               {/* 우: 장바구니 */}
-              <Card className="w-72 shrink-0 flex flex-col overflow-hidden">
+              <Card className="w-80 shrink-0 flex flex-col overflow-hidden">
                 <CardContent className="flex-1 overflow-hidden pt-4 flex flex-col">
-                  <CartPanel
-                    shopId={shop.id}
-                    items={cartItems}
-                    onUpdateQty={handleUpdateQty}
-                    onRemove={(lotId) =>
-                      setCartItems((prev) => prev.filter((i) => i.lotId !== lotId))
-                    }
-                    onClear={() => setCartItems([])}
-                  />
+                  <CartPanel shopId={shop.id} />
                 </CardContent>
               </Card>
             </div>

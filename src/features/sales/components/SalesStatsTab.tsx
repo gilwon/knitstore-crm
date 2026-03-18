@@ -11,11 +11,17 @@ import {
   Legend,
 } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { TrendingUp, ShoppingBag, BookOpen } from 'lucide-react'
+import { TrendingUp, TrendingDown, ShoppingBag, BookOpen } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { useSalesStats } from '../hooks/useSalesStats'
+import { useCustomerStats } from '../hooks/useCustomerStats'
 import { ProductRanking } from './ProductRanking'
 import { SubscriptionBreakdown } from './SubscriptionBreakdown'
 import { MarginTable } from './MarginTable'
+import { RevenueComposition } from './RevenueComposition'
+import { CustomerRanking } from './CustomerRanking'
+import { BrandMarginTable } from './BrandMarginTable'
+import { calcGrowthRate, getPreviousPeriodRange } from '../utils/period'
 
 interface Props {
   shopId: string
@@ -26,6 +32,9 @@ interface Props {
 
 export function SalesStatsTab({ shopId, from, to, dateRange }: Props) {
   const { data: stats, isLoading } = useSalesStats(shopId, from, to)
+  const { prevFrom, prevTo } = getPreviousPeriodRange(from, to)
+  const { data: prevStats } = useSalesStats(shopId, prevFrom, prevTo)
+  const { data: customers } = useCustomerStats(shopId, from, to)
 
   if (isLoading) {
     return (
@@ -35,9 +44,21 @@ export function SalesStatsTab({ shopId, from, to, dateRange }: Props) {
 
   if (!stats) return null
 
+  const revenueGrowth = prevStats ? calcGrowthRate(stats.totalRevenue, prevStats.totalRevenue) : null
+
+  function GrowthBadge({ value }: { value: number | null }) {
+    if (value == null) return null
+    return (
+      <span className={`text-xs font-medium flex items-center gap-0.5 ${value >= 0 ? 'text-emerald-600' : 'text-destructive'}`}>
+        {value >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+        {value >= 0 ? '+' : ''}{value}%
+      </span>
+    )
+  }
+
   return (
     <div className="space-y-4">
-      {/* 섹션 1: 매출 요약 카드 */}
+      {/* 섹션 1: 매출 요약 카드 (성장률 배지 추가) */}
       <div className="grid grid-cols-3 gap-3">
         <Card>
           <CardHeader className="pb-1 pt-4">
@@ -46,10 +67,13 @@ export function SalesStatsTab({ shopId, from, to, dateRange }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-4">
-            <p className="text-xl font-bold">
-              {stats.totalRevenue.toLocaleString()}
-              <span className="text-xs font-normal text-muted-foreground ml-1">원</span>
-            </p>
+            <div className="flex items-baseline gap-1">
+              <p className="text-xl font-bold">
+                {stats.totalRevenue.toLocaleString()}
+                <span className="text-xs font-normal text-muted-foreground ml-1">원</span>
+              </p>
+              <GrowthBadge value={revenueGrowth} />
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -59,10 +83,13 @@ export function SalesStatsTab({ shopId, from, to, dateRange }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-4">
-            <p className="text-xl font-bold">
-              {stats.productRevenue.toLocaleString()}
-              <span className="text-xs font-normal text-muted-foreground ml-1">원</span>
-            </p>
+            <div className="flex items-baseline gap-1">
+              <p className="text-xl font-bold">
+                {stats.productRevenue.toLocaleString()}
+                <span className="text-xs font-normal text-muted-foreground ml-1">원</span>
+              </p>
+              <GrowthBadge value={prevStats ? calcGrowthRate(stats.productRevenue, prevStats.productRevenue) : null} />
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -72,10 +99,13 @@ export function SalesStatsTab({ shopId, from, to, dateRange }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-4">
-            <p className="text-xl font-bold">
-              {stats.classRevenue.toLocaleString()}
-              <span className="text-xs font-normal text-muted-foreground ml-1">원</span>
-            </p>
+            <div className="flex items-baseline gap-1">
+              <p className="text-xl font-bold">
+                {stats.classRevenue.toLocaleString()}
+                <span className="text-xs font-normal text-muted-foreground ml-1">원</span>
+              </p>
+              <GrowthBadge value={prevStats ? calcGrowthRate(stats.classRevenue, prevStats.classRevenue) : null} />
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -131,6 +161,20 @@ export function SalesStatsTab({ shopId, from, to, dateRange }: Props) {
         totalMargin={stats.totalMargin}
         totalMarginRate={stats.totalMarginRate}
       />
+
+      {/* 섹션 6: 매출 구성비 + 브랜드별 마진 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <RevenueComposition
+          productRevenue={stats.productRevenue}
+          classRevenue={stats.classRevenue}
+        />
+        <BrandMarginTable items={stats.productRanking} />
+      </div>
+
+      {/* 섹션 7: 고객별 구매 패턴 */}
+      {customers && customers.length > 0 && (
+        <CustomerRanking items={customers} />
+      )}
     </div>
   )
 }

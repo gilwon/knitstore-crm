@@ -8,19 +8,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { useShopSettings, useUpdateShopName, useUpdatePassword, useUpdateSmartstoreKeys } from '@/features/settings/hooks/useSettings'
+import { useShopSettings, useUpdatePassword, useUpdateSmartstoreKeys } from '@/features/settings/hooks/useSettings'
 import { useSmartstoreTest } from '@/features/online-sales/hooks/useSmartstoreSync'
+import { ShopProfileForm } from '@/features/settings/components/ShopProfileForm'
+import { BackupExportButton } from '@/features/settings/components/BackupExportButton'
 
 export default function SettingsPage() {
   const router = useRouter()
   const { data, isLoading } = useShopSettings()
-
-  const [shopName, setShopName] = useState('')
-  const updateShopName = useUpdateShopName()
-
-  useEffect(() => {
-    if (data?.shop.name) setShopName(data.shop.name)
-  }, [data?.shop.name])
 
   const [currentPw, setCurrentPw] = useState('')
   const [newPw, setNewPw] = useState('')
@@ -79,36 +74,13 @@ export default function SettingsPage() {
       <div className="flex-1 overflow-y-auto p-6">
         <div className="space-y-4">
 
-          {/* 공방 정보 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">공방 정보</CardTitle>
-              <CardDescription>공방 이름을 변경합니다</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="shop-name">공방명</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="shop-name"
-                    value={shopName}
-                    onChange={(e) => setShopName(e.target.value)}
-                    placeholder="공방 이름을 입력하세요"
-                  />
-                  <Button
-                    onClick={() => {
-                      if (data?.shop.id) {
-                        updateShopName.mutate({ shopId: data.shop.id, name: shopName })
-                      }
-                    }}
-                    disabled={updateShopName.isPending || !shopName.trim() || shopName === data?.shop.name}
-                  >
-                    {updateShopName.isPending ? '저장 중...' : '저장'}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* 매장 프로필 (확장) */}
+          {data?.shop && (
+            <ShopProfileForm shopId={data.shop.id} shop={data.shop} />
+          )}
+
+          {/* 데이터 백업 */}
+          <BackupExportButton shopName={data?.shop.name ?? '공방'} />
 
           {/* 계정 정보 */}
           <Card>
