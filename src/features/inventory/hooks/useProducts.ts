@@ -3,7 +3,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import type { ProductWithLots } from '../types'
+import type { ProductWithLots, InventoryFilterState } from '../types'
+import { getStockStatus, getTotalStock } from '../types'
 
 export function useProduct(id: string) {
   return useQuery({
@@ -36,6 +37,57 @@ export function useProducts() {
       return (data ?? []) as unknown as ProductWithLots[]
     },
   })
+}
+
+export function filterAndSortProducts(
+  products: ProductWithLots[],
+  filters: InventoryFilterState,
+): ProductWithLots[] {
+  let result = products
+
+  // 검색
+  if (filters.search.trim()) {
+    const q = filters.search.toLowerCase()
+    result = result.filter((p) =>
+      p.name.toLowerCase().includes(q) ||
+      p.brand.toLowerCase().includes(q) ||
+      p.color_name.toLowerCase().includes(q) ||
+      p.color_code.toLowerCase().includes(q)
+    )
+  }
+
+  // 브랜드 필터
+  if (filters.brand !== 'all') {
+    result = result.filter((p) => p.brand === filters.brand)
+  }
+
+  // 재고 상태 필터
+  if (filters.stockStatus !== 'all') {
+    result = result.filter((p) => getStockStatus(p) === filters.stockStatus)
+  }
+
+  // 단위 필터
+  if (filters.unit !== 'all') {
+    result = result.filter((p) => p.unit === filters.unit)
+  }
+
+  // 정렬
+  result = [...result].sort((a, b) => {
+    switch (filters.sortBy) {
+      case 'name':
+        return a.name.localeCompare(b.name, 'ko')
+      case 'stock':
+        return getTotalStock(a) - getTotalStock(b)
+      case 'price':
+        return b.price - a.price
+      case 'created_at':
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      default:
+        return 0
+    }
+  })
+
+  return result
 }
 
 interface CreateProductInput {

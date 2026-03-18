@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import type { StudentWithSub, StudentWithDetails } from '../types'
+import type { StudentWithSub, StudentWithDetails, StudentFilterState } from '../types'
 
 export function useStudents() {
   return useQuery({
@@ -17,13 +17,87 @@ export function useStudents() {
 
       if (error) throw error
 
-      return (data ?? []).map((s) => {
+      const now = new Date()
+      const expiredIds: string[] = []
+
+      const result = (data ?? []).map((s) => {
         const subs = (s.subscriptions ?? []) as import('@/types/database').Subscription[]
-        const active = subs.find((sub) => sub.status === 'active') ?? null
-        return { ...s, activeSubscription: active } as StudentWithSub
+
+        // FR-02: 기간제 수강권 만료 자동 처리
+        const processedSubs = subs.map((sub) => {
+          if (
+            sub.status === 'active' &&
+            sub.type === 'period' &&
+            sub.expires_at &&
+            new Date(sub.expires_at) < now
+          ) {
+            expiredIds.push(sub.id)
+            return { ...sub, status: 'expired' as const }
+          }
+          return sub
+        })
+
+        const active = processedSubs.find((sub) => sub.status === 'active') ?? null
+        return { ...s, subscriptions: processedSubs, activeSubscription: active } as StudentWithSub
       })
+
+      // 만료된 수강권 DB 업데이트 (fire-and-forget)
+      if (expiredIds.length > 0) {
+        supabase
+          .from('subscriptions')
+          .update({ status: 'expired' })
+          .in('id', expiredIds)
+          .then(() => {})
+      }
+
+      return result
     },
   })
+}
+
+export function filterAndSortStudents(
+  students: StudentWithSub[],
+  filters: StudentFilterState,
+): StudentWithSub[] {
+  let result = students
+
+  // 검색
+  if (filters.search.trim()) {
+    const q = filters.search.toLowerCase()
+    result = result.filter((s) =>
+      s.name.toLowerCase().includes(q) ||
+      (s.phone ?? '').includes(q)
+    )
+  }
+
+  // 수강권 상태 필터
+  if (filters.subscriptionStatus !== 'all') {
+    result = result.filter((s) => {
+      const subs = s.subscriptions ?? []
+      if (filters.subscriptionStatus === 'none') {
+        return subs.length === 0 || !subs.some((sub) => sub.status === 'active')
+      }
+      return subs.some((sub) => sub.status === filters.subscriptionStatus)
+    })
+  }
+
+  // 정렬
+  result = [...result].sort((a, b) => {
+    switch (filters.sortBy) {
+      case 'recent_attendance': {
+        const hasActive = (s: StudentWithSub) =>
+          (s.subscriptions ?? []).some((sub) => sub.status === 'active') ? 1 : 0
+        const diff = hasActive(b) - hasActive(a)
+        return diff !== 0 ? diff : a.name.localeCompare(b.name, 'ko')
+      }
+      case 'created_at':
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      default:
+        return a.name.localeCompare(b.name, 'ko')
+    }
+  })
+
+  return result
 }
 
 export function useStudent(id: string) {

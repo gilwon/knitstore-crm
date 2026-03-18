@@ -17,6 +17,8 @@ import { AttendanceButton } from '@/features/students/components/AttendanceButto
 import { AttendanceHistory } from '@/features/students/components/AttendanceHistory'
 import { SubscriptionForm } from '@/features/students/components/SubscriptionForm'
 import { StudentForm } from '@/features/students/components/StudentForm'
+import { DeleteStudentDialog } from '@/features/students/components/DeleteStudentDialog'
+import { RenewSubscriptionButton } from '@/features/students/components/RenewSubscriptionButton'
 import { useStudent } from '@/features/students/hooks/useStudents'
 import { useShop } from '@/features/inventory/hooks/useShop'
 import { useDeleteSubscription } from '@/features/students/hooks/useSubscriptions'
@@ -50,6 +52,7 @@ export default function StudentDetailPage({ params }: PageProps) {
   const [editSubOpen, setEditSubOpen] = useState(false)
   const [editingSub, setEditingSub] = useState<Subscription | null>(null)
   const [deleteSubTarget, setDeleteSubTarget] = useState<Subscription | null>(null)
+  const [deleteStudentOpen, setDeleteStudentOpen] = useState(false)
   const deleteSub = useDeleteSubscription()
 
   if (isLoading) {
@@ -91,6 +94,15 @@ export default function StudentDetailPage({ params }: PageProps) {
           )}
         </div>
         <div className="flex gap-2 shrink-0">
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-destructive hover:text-destructive"
+            onClick={() => setDeleteStudentOpen(true)}
+          >
+            <Trash2 size={14} />
+            삭제
+          </Button>
           <Button size="sm" variant="outline" onClick={() => setEditFormOpen(true)}>
             수정
           </Button>
@@ -211,6 +223,11 @@ export default function StudentDetailPage({ params }: PageProps) {
                           >
                             <Pencil size={13} />
                           </Button>
+                          <RenewSubscriptionButton
+                            subscription={sub}
+                            studentId={student.id}
+                            studentName={student.name}
+                          />
                           <Button
                             size="icon"
                             variant="ghost"
@@ -297,6 +314,14 @@ export default function StudentDetailPage({ params }: PageProps) {
           editStudent={student}
         />
       )}
+
+      {/* FR-01: 수강생 삭제 확인 */}
+      <DeleteStudentDialog
+        student={student}
+        open={deleteStudentOpen}
+        onOpenChange={setDeleteStudentOpen}
+      />
+
     </div>
   )
 }

@@ -35,6 +35,7 @@ interface SubscriptionFormProps {
   studentId: string
   studentName: string
   editSubscription?: Subscription
+  renewFrom?: Subscription
 }
 
 const today = new Date().toISOString().slice(0, 10)
@@ -45,6 +46,7 @@ export function SubscriptionForm({
   studentId,
   studentName,
   editSubscription,
+  renewFrom,
 }: SubscriptionFormProps) {
   const createSub = useCreateSubscription()
   const updateSub = useUpdateSubscription()
@@ -69,11 +71,22 @@ export function SubscriptionForm({
           price: editSubscription.price,
           status: editSubscription.status as 'active' | 'expired' | 'exhausted',
         })
+      } else if (renewFrom) {
+        // FR-03: 동일 조건 재발급 — create 모드이지만 기존 값으로 프리필
+        reset({
+          type: renewFrom.type,
+          total_count: renewFrom.total_count ?? 8,
+          remaining: renewFrom.total_count ?? 8,
+          starts_at: today,
+          expires_at: '',
+          price: renewFrom.price,
+          status: 'active',
+        })
       } else {
         reset({ type: 'count', total_count: 8, remaining: 8, starts_at: today, price: 0, status: 'active' })
       }
     }
-  }, [open, editSubscription, reset])
+  }, [open, editSubscription, renewFrom, reset])
 
   async function onSubmit(values: FormValues) {
     if (isEdit) {
@@ -114,7 +127,7 @@ export function SubscriptionForm({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{isEdit ? '수강권 수정' : '수강권 등록'} — {studentName}</SheetTitle>
+          <SheetTitle>{isEdit ? '수강권 수정' : renewFrom ? '수강권 재발급' : '수강권 등록'} — {studentName}</SheetTitle>
         </SheetHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-4">
