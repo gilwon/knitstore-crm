@@ -47,3 +47,4 @@ CLAUDE.md
 docs/
 .claude/
 .claude/agent-memory/bkit-gap-detector/
+.bkit/
