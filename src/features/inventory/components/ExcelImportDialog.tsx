@@ -29,6 +29,8 @@ interface ParsedRow {
   lot_number: string
   quantity: number
   errors: string[]
+  existingProductId?: string   // 기존 상품 매칭 시 product id
+  existingProductName?: string // 기존 상품 매칭 시 표시용
 }
 
 interface ImportResult {
@@ -166,6 +168,34 @@ export function ExcelImportDialog({ open, onOpenChange, shopId }: ExcelImportDia
         toast.error('데이터가 없습니다. 1행은 헤더, 2행부터 데이터를 입력해주세요.')
         return
       }
+
+      // 기존 상품 조회 → 중복 감지
+      const supabase = createClient()
+      const { data: existingProducts } = await supabase
+        .from('products')
+        .select('id, name, brand, color_code, lots(lot_number)')
+        .eq('shop_id', shopId)
+
+      if (existingProducts) {
+        for (const row of parsed) {
+          const match = existingProducts.find(
+            (p) =>
+              p.name === row.name &&
+              (p.brand ?? '') === row.brand &&
+              (p.color_code ?? '') === row.color_code
+          )
+          if (match) {
+            row.existingProductId = match.id
+            row.existingProductName = `${match.brand ? match.brand + ' ' : ''}${match.name}`
+            // 기존 상품에 같은 로트번호가 이미 있으면 오류
+            const existingLots = (match.lots as { lot_number: string }[]) ?? []
+            if (row.lot_number && existingLots.some((l) => l.lot_number === row.lot_number)) {
+              row.errors.push(`로트 "${row.lot_number}" 이미 존재`)
+            }
+          }
+        }
+      }
+
       setRows(parsed)
       setStep('preview')
     } catch {
@@ -183,33 +213,44 @@ export function ExcelImportDialog({ open, onOpenChange, shopId }: ExcelImportDia
     const supabase = createClient()
     const details: ImportResult['details'] = []
 
+    // 같은 파일 내 중복 상품 추적 (name+brand+color_code → product_id)
+    const batchProductMap = new Map<string, string>()
+
     for (let i = 0; i < validRows.length; i++) {
       const row = validRows[i]
+      const productKey = `${row.name}|${row.brand}|${row.color_code}`
+
       try {
-        // 1. 상품 생성
-        const { data: product, error: productError } = await supabase
-          .from('products')
-          .insert({
-            shop_id: shopId,
-            name: row.name,
-            brand: row.brand,
-            color_code: row.color_code,
-            color_name: row.color_name,
-            unit: row.unit as 'ball' | 'g',
-            purchase_price: row.purchase_price,
-            price: row.price,
-            alert_threshold: row.alert_threshold,
-          })
-          .select()
-          .single()
+        let productId = row.existingProductId ?? batchProductMap.get(productKey)
 
-        if (productError) throw productError
+        if (!productId) {
+          // 신규 상품 생성
+          const { data: product, error: productError } = await supabase
+            .from('products')
+            .insert({
+              shop_id: shopId,
+              name: row.name,
+              brand: row.brand,
+              color_code: row.color_code,
+              color_name: row.color_name,
+              unit: row.unit as 'ball' | 'g',
+              purchase_price: row.purchase_price,
+              price: row.price,
+              alert_threshold: row.alert_threshold,
+            })
+            .select()
+            .single()
 
-        // 2. 초기 입고 (로트번호 + 수량 있을 때)
+          if (productError) throw productError
+          productId = product.id
+          batchProductMap.set(productKey, productId)
+        }
+
+        // 로트 + 입고 처리 (로트번호 + 수량 있을 때)
         if (row.lot_number && row.quantity > 0) {
           const { data: lot, error: lotError } = await supabase
             .from('lots')
-            .insert({ product_id: product.id, lot_number: row.lot_number })
+            .insert({ product_id: productId, lot_number: row.lot_number })
             .select()
             .single()
 
@@ -225,7 +266,8 @@ export function ExcelImportDialog({ open, onOpenChange, shopId }: ExcelImportDia
           if (stockError) throw stockError
         }
 
-        details.push({ row: row.rowIndex, name: row.name, ok: true, message: '등록 완료' })
+        const action = row.existingProductId ? '기존 상품에 로트 추가' : '등록 완료'
+        details.push({ row: row.rowIndex, name: row.name, ok: true, message: action })
       } catch (err) {
         const message = err instanceof Error ? err.message : '알 수 없는 오류'
         details.push({ row: row.rowIndex, name: row.name, ok: false, message })
@@ -305,11 +347,16 @@ export function ExcelImportDialog({ open, onOpenChange, shopId }: ExcelImportDia
         {/* Step 2: 미리보기 */}
         {step === 'preview' && (
           <div className="space-y-3 py-2">
-            <div className="flex items-center gap-3 text-sm">
+            <div className="flex items-center gap-3 text-sm flex-wrap">
               <span>전체 <strong>{rows.length}</strong>행</span>
               <Badge variant="default">{validRows.length}개 유효</Badge>
               {invalidRows.length > 0 && (
                 <Badge variant="destructive">{invalidRows.length}개 오류</Badge>
+              )}
+              {validRows.filter((r) => r.existingProductId).length > 0 && (
+                <Badge variant="secondary">
+                  {validRows.filter((r) => r.existingProductId).length}개 기존 상품
+                </Badge>
               )}
             </div>
 
@@ -337,10 +384,12 @@ export function ExcelImportDialog({ open, onOpenChange, shopId }: ExcelImportDia
                       <TableCell className="text-xs px-2">{row.lot_number || '-'}</TableCell>
                       <TableCell className="text-xs px-2">{row.quantity > 0 ? row.quantity : '-'}</TableCell>
                       <TableCell className="px-2">
-                        {row.errors.length === 0 ? (
-                          <CheckCircle2 size={14} className="text-emerald-500" />
-                        ) : (
+                        {row.errors.length > 0 ? (
                           <span className="text-xs text-destructive">{row.errors.join(', ')}</span>
+                        ) : row.existingProductId ? (
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0">로트 추가</Badge>
+                        ) : (
+                          <CheckCircle2 size={14} className="text-emerald-500" />
                         )}
                       </TableCell>
                     </TableRow>

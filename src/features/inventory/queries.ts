@@ -67,6 +67,7 @@ export async function createProduct(product: {
   color_code: string
   color_name: string
   unit: 'ball' | 'g'
+  purchase_price: number
   price: number
   alert_threshold: number
 }) {
@@ -82,6 +83,7 @@ export async function updateProduct(id: string, updates: {
   color_code?: string
   color_name?: string
   unit?: 'ball' | 'g'
+  purchase_price?: number
   price?: number
   alert_threshold?: number
 }) {
