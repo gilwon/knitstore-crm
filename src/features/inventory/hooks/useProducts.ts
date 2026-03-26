@@ -163,6 +163,6 @@ export function useDeleteProduct() {
       toast.success('상품이 삭제되었습니다')
       qc.invalidateQueries({ queryKey: ['products'] })
     },
-    onError: () => toast.error('상품 삭제에 실패했습니다'),
+    onError: (error: Error) => toast.error(`상품 삭제에 실패했습니다: ${error.message}`),
   })
 }
