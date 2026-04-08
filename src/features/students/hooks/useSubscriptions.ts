@@ -124,7 +124,7 @@ export function useCreateSubscription() {
       toast.success('수강권이 등록되었습니다')
       qc.invalidateQueries({ queryKey: ['students'] })
       qc.invalidateQueries({ queryKey: ['students', vars.student_id] })
-      qc.invalidateQueries({ queryKey: ['sales'] })
+      qc.invalidateQueries({ queryKey: ['salesWithSubs'] })
     },
     onError: () => toast.error('수강권 등록에 실패했습니다'),
   })
