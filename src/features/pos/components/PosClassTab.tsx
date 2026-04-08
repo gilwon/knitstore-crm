@@ -334,6 +334,7 @@ export function PosClassTab({ shopId }: PosClassTabProps) {
             onOpenChange={setNewSubOpen}
             studentId={selectedStudent.id}
             studentName={selectedStudent.name}
+            shopId={shopId}
           />
         </>
       )}

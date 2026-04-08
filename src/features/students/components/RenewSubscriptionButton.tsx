@@ -10,9 +10,10 @@ interface RenewSubscriptionButtonProps {
   subscription: Subscription
   studentId: string
   studentName: string
+  shopId: string
 }
 
-export function RenewSubscriptionButton({ subscription, studentId, studentName }: RenewSubscriptionButtonProps) {
+export function RenewSubscriptionButton({ subscription, studentId, studentName, shopId }: RenewSubscriptionButtonProps) {
   const [open, setOpen] = useState(false)
 
   if (subscription.status !== 'expired' && subscription.status !== 'exhausted') {
@@ -35,6 +36,7 @@ export function RenewSubscriptionButton({ subscription, studentId, studentName }
         onOpenChange={setOpen}
         studentId={studentId}
         studentName={studentName}
+        shopId={shopId}
         renewFrom={subscription}
       />
     </>

@@ -227,6 +227,7 @@ export default function StudentDetailPage({ params }: PageProps) {
                             subscription={sub}
                             studentId={student.id}
                             studentName={student.name}
+                            shopId={shop?.id ?? ''}
                           />
                           <Button
                             size="icon"
@@ -269,6 +270,7 @@ export default function StudentDetailPage({ params }: PageProps) {
         onOpenChange={setSubFormOpen}
         studentId={student.id}
         studentName={student.name}
+        shopId={shop?.id ?? ''}
       />
 
       {editingSub && (
@@ -277,6 +279,7 @@ export default function StudentDetailPage({ params }: PageProps) {
           onOpenChange={(v) => { setEditSubOpen(v); if (!v) setEditingSub(null) }}
           studentId={student.id}
           studentName={student.name}
+          shopId={shop?.id ?? ''}
           editSubscription={editingSub}
         />
       )}

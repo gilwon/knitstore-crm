@@ -34,6 +34,7 @@ interface SubscriptionFormProps {
   onOpenChange: (open: boolean) => void
   studentId: string
   studentName: string
+  shopId: string
   editSubscription?: Subscription
   renewFrom?: Subscription
 }
@@ -45,6 +46,7 @@ export function SubscriptionForm({
   onOpenChange,
   studentId,
   studentName,
+  shopId,
   editSubscription,
   renewFrom,
 }: SubscriptionFormProps) {
@@ -105,6 +107,7 @@ export function SubscriptionForm({
       if (values.type === 'count') {
         await createSub.mutateAsync({
           student_id: studentId,
+          shop_id: shopId,
           type: 'count',
           total_count: values.total_count ?? 1,
           starts_at: values.starts_at,
@@ -113,6 +116,7 @@ export function SubscriptionForm({
       } else {
         await createSub.mutateAsync({
           student_id: studentId,
+          shop_id: shopId,
           type: 'period',
           starts_at: values.starts_at,
           expires_at: values.expires_at,

@@ -9,6 +9,7 @@ type SubscriptionInsert = Database['public']['Tables']['subscriptions']['Insert'
 
 export interface CreateSubscriptionInput {
   student_id: string
+  shop_id: string
   type: 'count' | 'period'
   total_count?: number
   starts_at: string
@@ -93,14 +94,37 @@ export function useCreateSubscription() {
         remaining: input.type === 'count' ? (input.total_count ?? null) : null,
         expires_at: input.type === 'period' ? (input.expires_at ?? null) : null,
       }
-      const { data, error } = await supabase.from('subscriptions').insert(payload).select().single()
-      if (error) throw error
-      return data
+      const { data: subscription, error: subError } = await supabase.from('subscriptions').insert(payload).select().single()
+      if (subError) throw subError
+
+      const { data: sale, error: saleError } = await supabase
+        .from('sales')
+        .insert({
+          shop_id: input.shop_id,
+          type: 'class_fee',
+          total_amount: input.price,
+          student_id: input.student_id,
+        })
+        .select()
+        .single()
+      if (saleError) throw saleError
+
+      const { error: itemError } = await supabase.from('sale_items').insert({
+        sale_id: sale.id,
+        subscription_id: subscription.id,
+        quantity: 1,
+        unit_price: input.price,
+        subtotal: input.price,
+      })
+      if (itemError) throw itemError
+
+      return subscription
     },
     onSuccess: (_, vars) => {
       toast.success('수강권이 등록되었습니다')
       qc.invalidateQueries({ queryKey: ['students'] })
       qc.invalidateQueries({ queryKey: ['students', vars.student_id] })
+      qc.invalidateQueries({ queryKey: ['sales'] })
     },
     onError: () => toast.error('수강권 등록에 실패했습니다'),
   })
